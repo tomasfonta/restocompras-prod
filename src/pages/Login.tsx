@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,8 +14,8 @@ const Login = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulamos login exitoso y redirigimos al dashboard
-    navigate('/', { state: { userType } });
+    // Redirect to dashboard with user type
+    navigate('/dashboard', { state: { userType } });
   };
 
   return (
