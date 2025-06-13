@@ -1,20 +1,22 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ChevronDown, User, Settings } from "lucide-react";
+import { ChevronDown, User, Settings, LogOut } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
 interface HeaderProps {
   userType: 'supplier' | 'buyer';
   onUserTypeChange: (type: 'supplier' | 'buyer') => void;
+  onLogout?: () => void;
 }
 
-const Header = ({ userType, onUserTypeChange }: HeaderProps) => {
+const Header = ({ userType, onUserTypeChange, onLogout }: HeaderProps) => {
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4 shadow-sm">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
@@ -57,10 +59,34 @@ const Header = ({ userType, onUserTypeChange }: HeaderProps) => {
             <Settings className="w-4 h-4 mr-2" />
             Configuración
           </Button>
-          <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-            <User className="w-4 h-4 mr-2" />
-            Mi Perfil
-          </Button>
+          
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                <User className="w-4 h-4 mr-2" />
+                Mi Perfil
+                <ChevronDown className="w-4 h-4 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="bg-white border border-gray-200 shadow-lg" align="end">
+              <DropdownMenuItem className="hover:bg-gray-50">
+                <User className="w-4 h-4 mr-2" />
+                Ver Perfil
+              </DropdownMenuItem>
+              <DropdownMenuItem className="hover:bg-gray-50">
+                <Settings className="w-4 h-4 mr-2" />
+                Configuración
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={onLogout}
+                className="hover:bg-red-50 text-red-600"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Cerrar Sesión
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
     </header>

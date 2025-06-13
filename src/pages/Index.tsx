@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import SupplierPortal from '../components/SupplierPortal';
 import BuyerPortal from '../components/BuyerPortal';
@@ -94,8 +95,21 @@ const sampleProducts: Product[] = [
 ];
 
 const Index = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [userType, setUserType] = useState<'supplier' | 'buyer'>('buyer');
   const [products, setProducts] = useState<Product[]>(sampleProducts);
+
+  useEffect(() => {
+    // Obtener el tipo de usuario desde el state del login o usar valor por defecto
+    if (location.state?.userType) {
+      setUserType(location.state.userType);
+    }
+  }, [location.state]);
+
+  const handleLogout = () => {
+    navigate('/');
+  };
 
   const handleAddProduct = (productData: Omit<Product, 'id'>) => {
     const newProduct: Product = {
@@ -115,7 +129,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header userType={userType} onUserTypeChange={setUserType} />
+      <Header 
+        userType={userType} 
+        onUserTypeChange={setUserType}
+        onLogout={handleLogout}
+      />
       
       <main>
         {userType === 'supplier' ? (
