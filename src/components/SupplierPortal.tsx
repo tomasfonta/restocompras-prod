@@ -8,6 +8,7 @@ import ProductForm from './ProductForm';
 import ProductTable from './ProductTable';
 import CSVUpload from './CSVUpload';
 import { Product } from '../types/Product';
+import { downloadCSVTemplate } from '../utils/csvTemplate';
 
 interface SupplierPortalProps {
   products: Product[];
@@ -150,7 +151,11 @@ const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProdu
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button variant="outline" className="w-full">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={downloadCSVTemplate}
+                >
                   <Download className="w-4 h-4 mr-2" />
                   Descargar Plantilla CSV
                 </Button>

@@ -122,7 +122,12 @@ const SupplierProfile = ({ supplierId, products, onBack }: SupplierProfileProps)
                             <div>
                               <h4 className="font-semibold text-gray-900">{product.name}</h4>
                               <p className="text-sm text-gray-600">{product.brand}</p>
-                              <p className="text-xs text-gray-500">{product.dimension}</p>
+                              <div className="flex items-center space-x-2 mt-1">
+                                <span className="text-sm font-medium text-gray-900">{product.size}</span>
+                                <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-md font-medium">
+                                  {product.dimension}
+                                </span>
+                              </div>
                             </div>
                             <div className="text-right">
                               <div className="text-lg font-bold text-gray-900">${product.price.toFixed(2)}</div>
