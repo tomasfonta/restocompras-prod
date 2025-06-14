@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle, Upload, Download, BarChart3, FileSpreadsheet } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { PlusCircle, Upload, Download, BarChart3, FileSpreadsheet, Search } from "lucide-react";
 import ProductForm from './ProductForm';
 import ProductTable from './ProductTable';
 import CSVUpload from './CSVUpload';
@@ -22,6 +23,7 @@ interface SupplierPortalProps {
 const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProduct, supplierId, supplierName }: SupplierPortalProps) => {
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
@@ -46,6 +48,13 @@ const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProdu
     updates.forEach(({ id, product }) => onUpdateProduct(id, product));
   };
 
+  // Filter products based on search term
+  const filteredProducts = products.filter(product =>
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    product.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
       <Tabs defaultValue="products" className="w-full">
@@ -57,7 +66,7 @@ const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProdu
         </TabsList>
 
         <TabsContent value="products" className="space-y-6">
-          <div className="flex justify-between items-center">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Mis Productos</h2>
               <p className="text-gray-600">Gestiona tu catálogo de productos</p>
@@ -69,6 +78,18 @@ const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProdu
               <PlusCircle className="w-4 h-4 mr-2" />
               Nuevo Producto
             </Button>
+          </div>
+
+          {/* Search Bar */}
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              type="text"
+              placeholder="Buscar productos por nombre, marca o categoría..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
 
           {showProductForm ? (
@@ -89,7 +110,7 @@ const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProdu
             </Card>
           ) : (
             <ProductTable
-              products={products}
+              products={filteredProducts}
               onEdit={handleEditProduct}
               onDelete={onDeleteProduct}
               isSupplierView={true}
