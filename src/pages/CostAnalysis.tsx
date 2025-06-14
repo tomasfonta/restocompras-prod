@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, TrendingDown, TrendingUp, DollarSign, Package } from "lucide-react";
+import { ArrowLeft, TrendingDown, TrendingUp, DollarSign, Package, Calendar, CalendarDays } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useUser } from '../contexts/UserContext';
 import { useData } from '../contexts/DataContext';
@@ -31,11 +31,19 @@ const CostAnalysis = () => {
             currentCost: ingredient.cost || 0,
             quantity: ingredient.quantity,
             unit: ingredient.unit,
-            dishes: [dish.name]
+            dishes: [{
+              name: dish.name,
+              monthlyServings: dish.monthlyServings || 0
+            }],
+            totalMonthlyServings: dish.monthlyServings || 0
           });
         } else {
           const existing = ingredientMap.get(key);
-          existing.dishes.push(dish.name);
+          existing.dishes.push({
+            name: dish.name,
+            monthlyServings: dish.monthlyServings || 0
+          });
+          existing.totalMonthlyServings += dish.monthlyServings || 0;
           // Use the higher cost if there's a difference
           if (ingredient.cost && ingredient.cost > existing.currentCost) {
             existing.currentCost = ingredient.cost;
@@ -53,7 +61,9 @@ const CostAnalysis = () => {
       );
 
       let cheapestAlternative = null;
-      let potentialSavings = 0;
+      let potentialSavingsPerUnit = 0;
+      let monthlySavings = 0;
+      let annualSavings = 0;
 
       if (similarProducts.length > 0) {
         // Find the cheapest alternative
@@ -66,25 +76,34 @@ const CostAnalysis = () => {
         const currentCostPerUnit = ingredient.currentCost / ingredient.quantity;
         
         if (alternativeCostPerUnit < currentCostPerUnit) {
-          potentialSavings = (currentCostPerUnit - alternativeCostPerUnit) * ingredient.quantity;
+          potentialSavingsPerUnit = (currentCostPerUnit - alternativeCostPerUnit) * ingredient.quantity;
+          
+          // Calculate monthly and annual savings based on servings
+          if (ingredient.totalMonthlyServings > 0) {
+            monthlySavings = potentialSavingsPerUnit * ingredient.totalMonthlyServings;
+            annualSavings = monthlySavings * 12;
+          }
         }
       }
 
       return {
         ...ingredient,
         cheapestAlternative,
-        potentialSavings,
-        savingsPercentage: ingredient.currentCost > 0 && potentialSavings > 0 
-          ? (potentialSavings / ingredient.currentCost) * 100 
+        potentialSavingsPerUnit,
+        monthlySavings,
+        annualSavings,
+        savingsPercentage: ingredient.currentCost > 0 && potentialSavingsPerUnit > 0 
+          ? (potentialSavingsPerUnit / ingredient.currentCost) * 100 
           : 0
       };
     });
 
-    return analysis.sort((a, b) => b.potentialSavings - a.potentialSavings);
+    return analysis.sort((a, b) => b.monthlySavings - a.monthlySavings);
   }, [userDishes, products]);
 
   const totalCurrentCost = ingredientAnalysis.reduce((sum, item) => sum + item.currentCost, 0);
-  const totalPotentialSavings = ingredientAnalysis.reduce((sum, item) => sum + item.potentialSavings, 0);
+  const totalMonthlySavings = ingredientAnalysis.reduce((sum, item) => sum + item.monthlySavings, 0);
+  const totalAnnualSavings = ingredientAnalysis.reduce((sum, item) => sum + item.annualSavings, 0);
 
   if (!currentUser || currentUser.userType !== 'restaurant') {
     return (
@@ -109,12 +128,12 @@ const CostAnalysis = () => {
           </Button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Análisis de Costos</h1>
-            <p className="text-gray-600">Compara los costos de tus ingredientes con alternativas más baratas</p>
+            <p className="text-gray-600">Compara los costos de tus ingredientes con alternativas más baratas y calcula ahorros mensuales y anuales</p>
           </div>
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Costo Total Actual</CardTitle>
@@ -130,13 +149,26 @@ const CostAnalysis = () => {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Ahorro Potencial</CardTitle>
-              <TrendingDown className="h-4 w-4 text-green-600" />
+              <CardTitle className="text-sm font-medium">Ahorro Mensual</CardTitle>
+              <Calendar className="h-4 w-4 text-green-600" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">${totalPotentialSavings.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-green-600">${totalMonthlySavings.toFixed(2)}</div>
               <p className="text-xs text-muted-foreground">
-                {totalCurrentCost > 0 ? ((totalPotentialSavings / totalCurrentCost) * 100).toFixed(1) : 0}% de ahorro posible
+                Ahorro potencial mensual
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Ahorro Anual</CardTitle>
+              <CalendarDays className="h-4 w-4 text-blue-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-blue-600">${totalAnnualSavings.toFixed(2)}</div>
+              <p className="text-xs text-muted-foreground">
+                Ahorro potencial anual
               </p>
             </CardContent>
           </Card>
@@ -175,9 +207,11 @@ const CostAnalysis = () => {
                     <TableHead>Ingrediente</TableHead>
                     <TableHead>Cantidad</TableHead>
                     <TableHead>Costo Actual</TableHead>
+                    <TableHead>Porciones/Mes</TableHead>
                     <TableHead>Alternativa Más Barata</TableHead>
                     <TableHead>Proveedor</TableHead>
-                    <TableHead>Ahorro Potencial</TableHead>
+                    <TableHead>Ahorro Mensual</TableHead>
+                    <TableHead>Ahorro Anual</TableHead>
                     <TableHead>Platos</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -187,6 +221,11 @@ const CostAnalysis = () => {
                       <TableCell className="font-medium">{ingredient.name}</TableCell>
                       <TableCell>{ingredient.quantity} {ingredient.unit}</TableCell>
                       <TableCell>${ingredient.currentCost.toFixed(2)}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {ingredient.totalMonthlyServings}
+                        </Badge>
+                      </TableCell>
                       <TableCell>
                         {ingredient.cheapestAlternative ? (
                           <div>
@@ -212,10 +251,10 @@ const CostAnalysis = () => {
                         )}
                       </TableCell>
                       <TableCell>
-                        {ingredient.potentialSavings > 0 ? (
+                        {ingredient.monthlySavings > 0 ? (
                           <div className="text-green-600">
                             <div className="font-medium">
-                              ${ingredient.potentialSavings.toFixed(2)}
+                              ${ingredient.monthlySavings.toFixed(2)}
                             </div>
                             <div className="text-sm">
                               ({ingredient.savingsPercentage.toFixed(1)}%)
@@ -226,11 +265,24 @@ const CostAnalysis = () => {
                         )}
                       </TableCell>
                       <TableCell>
+                        {ingredient.annualSavings > 0 ? (
+                          <div className="text-blue-600 font-medium">
+                            ${ingredient.annualSavings.toFixed(2)}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">Sin ahorro</span>
+                        )}
+                      </TableCell>
+                      <TableCell>
                         <div className="text-sm">
-                          {ingredient.dishes.slice(0, 2).join(', ')}
+                          {ingredient.dishes.slice(0, 2).map(dish => (
+                            <div key={dish.name}>
+                              {dish.name} ({dish.monthlyServings}/mes)
+                            </div>
+                          ))}
                           {ingredient.dishes.length > 2 && (
                             <span className="text-gray-500">
-                              {' '}+{ingredient.dishes.length - 2} más
+                              +{ingredient.dishes.length - 2} más
                             </span>
                           )}
                         </div>

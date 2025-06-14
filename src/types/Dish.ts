@@ -16,6 +16,7 @@ export interface Dish {
   ingredients: Ingredient[];
   isActive: boolean;
   userId: string; // Associate dish with user
+  monthlyServings?: number; // Average monthly servings
   createdAt: string;
   updatedAt: string;
 }

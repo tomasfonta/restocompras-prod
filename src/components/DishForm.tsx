@@ -22,6 +22,7 @@ const DishForm: React.FC<DishFormProps> = ({ dish, onSave, onCancel }) => {
   const [description, setDescription] = useState(dish?.description || '');
   const [price, setPrice] = useState(dish?.price || 0);
   const [preparationTime, setPreparationTime] = useState(dish?.preparationTime || 0);
+  const [monthlyServings, setMonthlyServings] = useState(dish?.monthlyServings || 0);
   const [isActive, setIsActive] = useState(dish?.isActive ?? true);
   const [ingredients, setIngredients] = useState<Ingredient[]>(dish?.ingredients || []);
   const [newIngredient, setNewIngredient] = useState<Omit<Ingredient, 'id'>>({
@@ -66,6 +67,7 @@ const DishForm: React.FC<DishFormProps> = ({ dish, onSave, onCancel }) => {
       description,
       price,
       preparationTime,
+      monthlyServings,
       ingredients,
       isActive,
       userId: currentUser.id
@@ -113,15 +115,28 @@ const DishForm: React.FC<DishFormProps> = ({ dish, onSave, onCancel }) => {
             />
           </div>
 
-          <div>
-            <Label htmlFor="preparationTime">Tiempo de Preparación (minutos)</Label>
-            <Input
-              id="preparationTime"
-              type="number"
-              value={preparationTime}
-              onChange={(e) => setPreparationTime(parseInt(e.target.value))}
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="preparationTime">Tiempo de Preparación (minutos)</Label>
+              <Input
+                id="preparationTime"
+                type="number"
+                value={preparationTime}
+                onChange={(e) => setPreparationTime(parseInt(e.target.value))}
+                required
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="monthlyServings">Porciones Mensuales Promedio</Label>
+              <Input
+                id="monthlyServings"
+                type="number"
+                value={monthlyServings}
+                onChange={(e) => setMonthlyServings(parseInt(e.target.value))}
+                placeholder="¿Cuántas veces al mes sirves este plato?"
+              />
+            </div>
           </div>
 
           <div className="flex items-center space-x-2">

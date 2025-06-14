@@ -1,149 +1,164 @@
-
-import { useState, useMemo } from 'react';
-import { Input } from "@/components/ui/input";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter } from "lucide-react";
-import ProductTable from './ProductTable';
-import SupplierProfile from './SupplierProfile';
-import MenuManagement from './MenuManagement';
+import { Search, Package, Truck, Star, BarChart3 } from "lucide-react";
 import { Product } from '../types/Product';
-import { CATEGORIES } from '../types/Category';
+import { useUser } from '../contexts/UserContext';
+import MenuManagement from './MenuManagement';
 
 interface BuyerPortalProps {
   products: Product[];
 }
 
-const BuyerPortal = ({ products }: BuyerPortalProps) => {
+const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
+  const navigate = useNavigate();
+  const { currentUser } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [priceFilter, setPriceFilter] = useState<string>('all');
-  const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedQuality, setSelectedQuality] = useState('all');
+
+  // Get unique categories and qualities for filters
+  const categories = Array.from(new Set(products.map(p => p.category)));
+  const qualities = Array.from(new Set(products.map(p => p.quality)));
 
   // Filter products based on search and filters
-  const filteredProducts = useMemo(() => {
-    return products.filter(product => {
-      const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           product.brand.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-      
-      let matchesPrice = true;
-      if (priceFilter === 'low') matchesPrice = product.price < 50;
-      else if (priceFilter === 'medium') matchesPrice = product.price >= 50 && product.price < 200;
-      else if (priceFilter === 'high') matchesPrice = product.price >= 200;
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product.supplierName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+    const matchesQuality = selectedQuality === 'all' || product.quality === selectedQuality;
+    
+    return matchesSearch && matchesCategory && matchesQuality;
+  });
 
-      return matchesSearch && matchesCategory && matchesPrice;
-    });
-  }, [products, searchTerm, selectedCategory, priceFilter]);
-
-  if (selectedSupplier) {
-    return (
-      <SupplierProfile 
-        supplierId={selectedSupplier}
-        products={products.filter(p => p.supplierId === selectedSupplier)}
-        onBack={() => setSelectedSupplier(null)}
-      />
-    );
-  }
+  const getQualityColor = (quality: string) => {
+    switch (quality.toLowerCase()) {
+      case 'alta': return 'bg-green-100 text-green-800';
+      case 'media': return 'bg-yellow-100 text-yellow-800';
+      case 'baja': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Management Tabs */}
-      <Tabs defaultValue="catalog" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-gray-100">
-          <TabsTrigger value="catalog" className="data-[state=active]:bg-white">Catálogo de Productos</TabsTrigger>
-          <TabsTrigger value="menu" className="data-[state=active]:bg-white">Mi Menú</TabsTrigger>
+    <div className="max-w-7xl mx-auto p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Portal del Comprador</h1>
+        <p className="text-gray-600">Explora productos de proveedores y gestiona tu menú</p>
+      </div>
+
+      <Tabs defaultValue="catalog" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="catalog">Catálogo de Productos</TabsTrigger>
+          <TabsTrigger value="menu">Mi Menú</TabsTrigger>
         </TabsList>
 
         <TabsContent value="catalog" className="space-y-6">
-          {/* Filters */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Filter className="w-5 h-5 mr-2 text-amber-600" />
-                Filtros de Búsqueda
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input
-                    placeholder="Buscar productos o marcas..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
+          {/* Cost Analysis Button */}
+          <div className="flex justify-end">
+            <Button 
+              onClick={() => navigate('/cost-analysis')}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Análisis de Costos
+            </Button>
+          </div>
 
-                <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Categoría" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectItem value="all">Todas las categorías</SelectItem>
-                    {CATEGORIES.map(category => (
-                      <SelectItem key={category.id} value={category.name}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+          {/* Search and Filters Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Input
+              type="search"
+              placeholder="Buscar productos..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Categoría" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las categorías</SelectItem>
+                {categories.map(category => (
+                  <SelectItem key={category} value={category}>{category}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select onValueChange={setSelectedQuality} defaultValue={selectedQuality}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Calidad" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas las calidades</SelectItem>
+                {qualities.map(quality => (
+                  <SelectItem key={quality} value={quality}>{quality}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-                <Select value={priceFilter} onValueChange={setPriceFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Rango de precio" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    <SelectItem value="all">Todos los precios</SelectItem>
-                    <SelectItem value="low">Menos de $50</SelectItem>
-                    <SelectItem value="medium">$50 - $200</SelectItem>
-                    <SelectItem value="high">Más de $200</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setSearchTerm('');
-                    setSelectedCategory('all');
-                    setPriceFilter('all');
-                  }}
-                  className="border-gray-300"
-                >
-                  Limpiar Filtros
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Products Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Catálogo de Productos</CardTitle>
-              <CardDescription>
-                Compara productos de diferentes proveedores y encuentra las mejores ofertas
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ProductTable
-                products={filteredProducts}
-                onEdit={() => {}}
-                onDelete={() => {}}
-                isSupplierView={false}
-                onSupplierClick={setSelectedSupplier}
-              />
-            </CardContent>
-          </Card>
+          {/* Products Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProducts.map(product => (
+              <Card key={product.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-3">
+                  <div className="flex justify-between items-start">
+                    <CardTitle className="text-lg">{product.name}</CardTitle>
+                    <Badge className={getQualityColor(product.quality)}>
+                      {product.quality}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-gray-600 text-sm">{product.description}</p>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="text-gray-700 font-medium">Marca:</span> {product.brand}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Package className="w-4 h-4 text-gray-500" />
+                      <span>{product.size}{product.dimension}</span>
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-2">
+                      <Truck className="w-4 h-4 text-gray-500" />
+                      <span>{product.deliveryDays} días</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Star className="w-4 h-4 text-yellow-500" />
+                      <span>{product.rating}</span>
+                    </div>
+                  </div>
+                  <footer>
+                    <div className="text-sm text-gray-500">
+                      Proveedor: {product.supplierName}
+                    </div>
+                  </footer>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </TabsContent>
 
         <TabsContent value="menu" className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Gestión de Menú</h2>
-            <p className="text-gray-600">Administra los platos de tu restaurante y sus ingredientes</p>
+          {/* Cost Analysis Button */}
+          <div className="flex justify-end">
+            <Button 
+              onClick={() => navigate('/cost-analysis')}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Análisis de Costos
+            </Button>
           </div>
+          
           <MenuManagement />
         </TabsContent>
       </Tabs>
