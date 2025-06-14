@@ -168,17 +168,6 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
               required
             />
           </div>
-
-          <div>
-            <Label htmlFor="supplierName">Nombre del Proveedor*</Label>
-            <Input
-              id="supplierName"
-              value={formData.supplierName}
-              onChange={(e) => setFormData({...formData, supplierName: e.target.value})}
-              placeholder="Nombre de tu empresa"
-              required
-            />
-          </div>
         </div>
       </div>
 
