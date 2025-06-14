@@ -40,7 +40,7 @@ const CSVUpload = ({ onUpload }: CSVUploadProps) => {
       }
 
       const headers = lines[0].split(',').map(h => h.trim());
-      const requiredHeaders = ['name', 'dimension', 'brand', 'price', 'category', 'quality', 'deliveryDays', 'supplierName'];
+      const requiredHeaders = ['name', 'size', 'dimension', 'brand', 'price', 'category', 'quality', 'deliveryDays', 'supplierName'];
       
       const missingHeaders = requiredHeaders.filter(header => !headers.includes(header));
       if (missingHeaders.length > 0) {
@@ -62,6 +62,7 @@ const CSVUpload = ({ onUpload }: CSVUploadProps) => {
           // Validate and transform data
           const product: Omit<Product, 'id'> = {
             name: rowData.name,
+            size: parseFloat(rowData.size),
             dimension: rowData.dimension,
             brand: rowData.brand,
             price: parseFloat(rowData.price),
@@ -75,7 +76,7 @@ const CSVUpload = ({ onUpload }: CSVUploadProps) => {
           };
 
           // Basic validation
-          if (!product.name || !product.brand || isNaN(product.price)) {
+          if (!product.name || !product.brand || isNaN(product.price) || isNaN(product.size)) {
             errors.push(`Fila ${i + 1}: Datos incompletos o inválidos`);
             continue;
           }
@@ -193,8 +194,8 @@ const CSVUpload = ({ onUpload }: CSVUploadProps) => {
         <CardContent className="py-4">
           <div className="text-sm text-blue-800">
             <p className="font-medium mb-2">Formato requerido para el CSV:</p>
-            <p className="mb-2">Las columnas deben incluir: name, dimension, brand, price, category, quality, deliveryDays, supplierName</p>
-            <p>Ejemplo: "Leche Entera,1L,La Serenísima,45.50,Lácteos,Alta,2,Mi Empresa"</p>
+            <p className="mb-2">Las columnas deben incluir: name, size, dimension, brand, price, category, quality, deliveryDays, supplierName</p>
+            <p>Ejemplo: "Leche Entera,1,L,La Serenísima,45.50,Lácteos,Alta,2,Mi Empresa"</p>
           </div>
         </CardContent>
       </Card>

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent } from "@/components/ui/card";
 import { Product } from '../types/Product';
 import { CATEGORIES } from '../types/Category';
+import { DIMENSIONS } from '../types/Dimension';
 
 interface ProductFormProps {
   initialData?: Product | null;
@@ -17,6 +18,7 @@ interface ProductFormProps {
 const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
   const [formData, setFormData] = useState({
     name: '',
+    size: 0,
     dimension: '',
     brand: '',
     price: 0,
@@ -33,6 +35,7 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
     if (initialData) {
       setFormData({
         name: initialData.name,
+        size: initialData.size,
         dimension: initialData.dimension,
         brand: initialData.brand,
         price: initialData.price,
@@ -78,15 +81,35 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
             />
           </div>
 
-          <div>
-            <Label htmlFor="dimension">Dimensión/Peso*</Label>
-            <Input
-              id="dimension"
-              value={formData.dimension}
-              onChange={(e) => setFormData({...formData, dimension: e.target.value})}
-              placeholder="Ej: 1L, 500g, 12 unidades"
-              required
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="size">Tamaño*</Label>
+              <Input
+                id="size"
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.size}
+                onChange={(e) => setFormData({...formData, size: parseFloat(e.target.value) || 0})}
+                placeholder="Ej: 1, 500, 0.5"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="dimension">Dimensión*</Label>
+              <Select value={formData.dimension} onValueChange={(value) => setFormData({...formData, dimension: value})}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Unidad" />
+                </SelectTrigger>
+                <SelectContent className="bg-white">
+                  {DIMENSIONS.map(dimension => (
+                    <SelectItem key={dimension.id} value={dimension.name}>
+                      {dimension.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div>

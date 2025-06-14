@@ -11,7 +11,8 @@ const sampleProducts: Product[] = [
   {
     id: '1',
     name: 'Leche Entera',
-    dimension: '1L',
+    size: 1,
+    dimension: 'L',
     brand: 'La Serenísima',
     price: 45.50,
     category: 'Lácteos',
@@ -25,7 +26,8 @@ const sampleProducts: Product[] = [
   {
     id: '2',
     name: 'Pan de Molde Integral',
-    dimension: '500g',
+    size: 500,
+    dimension: 'g',
     brand: 'Bimbo',
     price: 32.00,
     category: 'Panadería',
@@ -39,7 +41,8 @@ const sampleProducts: Product[] = [
   {
     id: '3',
     name: 'Aceite de Oliva Extra Virgen',
-    dimension: '500ml',
+    size: 500,
+    dimension: 'mL',
     brand: 'Cocinero',
     price: 125.75,
     category: 'Aceites',
@@ -53,7 +56,8 @@ const sampleProducts: Product[] = [
   {
     id: '4',
     name: 'Tomate Perita',
-    dimension: '1kg',
+    size: 1,
+    dimension: 'kg',
     brand: 'Del Campo',
     price: 28.90,
     category: 'Verduras',
@@ -67,7 +71,8 @@ const sampleProducts: Product[] = [
   {
     id: '5',
     name: 'Carne Molida Especial',
-    dimension: '1kg',
+    size: 1,
+    dimension: 'kg',
     brand: 'Frigorífico San Jorge',
     price: 89.50,
     category: 'Carnes',
@@ -81,7 +86,8 @@ const sampleProducts: Product[] = [
   {
     id: '6',
     name: 'Yogur Natural',
-    dimension: '900g',
+    size: 900,
+    dimension: 'g',
     brand: 'Danone',
     price: 67.25,
     category: 'Lácteos',

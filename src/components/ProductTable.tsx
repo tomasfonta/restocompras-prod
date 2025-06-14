@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -123,7 +122,7 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
                 <td className="p-4">
                   <div>
                     <div className="font-semibold text-gray-900">{product.name}</div>
-                    <div className="text-sm text-gray-600">{product.brand} • {product.dimension}</div>
+                    <div className="text-sm text-gray-600">{product.brand} • {product.size}{product.dimension}</div>
                   </div>
                 </td>
                 <td className="p-4">
@@ -208,7 +207,7 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                  <p className="text-sm text-gray-600">{product.brand} • {product.dimension}</p>
+                  <p className="text-sm text-gray-600">{product.brand} • {product.size}{product.dimension}</p>
                 </div>
                 <span className={`font-bold px-2 py-1 rounded-md text-sm ${getPriceColor(product.price)}`}>
                   ${product.price.toFixed(2)}
