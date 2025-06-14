@@ -87,35 +87,29 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
           <thead className="bg-gray-50">
             <tr>
               <th 
-                className="text-left p-4 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100"
+                className="text-left p-4 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 w-2/5"
                 onClick={() => handleSort('name')}
               >
                 Producto
               </th>
-              <th className="text-left p-4 font-semibold text-gray-900">Tamaño/Dimensión</th>
+              <th className="text-left p-4 font-semibold text-gray-900 w-24">Tamaño</th>
               <th 
-                className="text-left p-4 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100"
-                onClick={() => handleSort('category')}
-              >
-                Categoría
-              </th>
-              <th 
-                className="text-left p-4 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100"
+                className="text-left p-4 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 w-32"
                 onClick={() => handleSort('price')}
               >
                 Precio
               </th>
-              <th className="text-left p-4 font-semibold text-gray-900">Calidad</th>
+              <th className="text-left p-4 font-semibold text-gray-900 w-24">Calidad</th>
               <th 
-                className="text-left p-4 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100"
+                className="text-left p-4 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 w-24"
                 onClick={() => handleSort('deliveryDays')}
               >
                 Entrega
               </th>
               {!isSupplierView && (
-                <th className="text-left p-4 font-semibold text-gray-900">Proveedor</th>
+                <th className="text-left p-4 font-semibold text-gray-900 w-32">Proveedor</th>
               )}
-              <th className="text-left p-4 font-semibold text-gray-900">Acciones</th>
+              <th className="text-left p-4 font-semibold text-gray-900 w-32">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -123,22 +117,14 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
               <tr key={product.id} className="border-t hover:bg-gray-50 transition-colors">
                 <td className="p-4">
                   <div>
-                    <div className="font-semibold text-gray-900">{product.name}</div>
+                    <div className="font-bold text-lg text-gray-900">{product.name}</div>
                     <div className="text-sm text-gray-600">{product.brand}</div>
                   </div>
                 </td>
                 <td className="p-4">
-                  <div className="flex items-center space-x-1">
-                    <span className="font-medium text-gray-900">{product.size}</span>
-                    <span className="text-sm text-amber-600 bg-amber-50 px-2 py-1 rounded-md font-medium">
-                      {product.dimension}
-                    </span>
-                  </div>
-                </td>
-                <td className="p-4">
-                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                    {product.category}
-                  </Badge>
+                  <span className="text-sm font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-md">
+                    {product.size} {product.dimension}
+                  </span>
                 </td>
                 <td className="p-4">
                   <span className={`font-bold px-2 py-1 rounded-md ${getPriceColor(product.price)}`}>
@@ -216,14 +202,11 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
             <div className="space-y-3">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-semibold text-gray-900">{product.name}</h3>
+                  <h3 className="font-bold text-lg text-gray-900">{product.name}</h3>
                   <p className="text-sm text-gray-600">{product.brand}</p>
-                  <div className="flex items-center space-x-2 mt-1">
-                    <span className="text-sm font-medium text-gray-900">{product.size}</span>
-                    <span className="text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-md font-medium">
-                      {product.dimension}
-                    </span>
-                  </div>
+                  <span className="text-sm font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-md inline-block mt-1">
+                    {product.size} {product.dimension}
+                  </span>
                 </div>
                 <span className={`font-bold px-2 py-1 rounded-md text-sm ${getPriceColor(product.price)}`}>
                   ${product.price.toFixed(2)}
@@ -231,9 +214,6 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
               </div>
               
               <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                  {product.category}
-                </Badge>
                 <div className="flex items-center space-x-1">
                   {getQualityIcon(product.quality)}
                   <span className="text-sm">{product.quality}</span>
