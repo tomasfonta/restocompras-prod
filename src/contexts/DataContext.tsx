@@ -2,6 +2,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product } from '../types/Product';
 import { Dish } from '../types/Dish';
+import { DIMENSIONS } from '../types/Dimension';
+import { CATEGORIES } from '../types/Category';
 
 interface DataContextType {
   products: Product[];
@@ -21,40 +23,52 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 // Generate sample products for current supplier (user-2)
 const generateCurrentSupplierProducts = (): Product[] => {
   const products: Product[] = [];
-  const categories = ['Lácteos', 'Panadería', 'Aceites', 'Verduras', 'Carnes', 'Frutas', 'Bebidas', 'Cereales', 'Condimentos', 'Conservas'];
-  const brands = ['La Serenísima', 'Sancor', 'Mastellone', 'Danone', 'Nestlé', 'Arcor', 'Molinos Río de la Plata', 'AGD', 'Bimbo', 'Fargo'];
-  const productNames = [
-    'Leche Entera', 'Leche Descremada', 'Yogur Natural', 'Queso Cremoso', 'Manteca', 'Crema de Leche',
-    'Pan Lactal', 'Pan Integral', 'Facturas Surtidas', 'Medialunas', 'Pan Francés', 'Pan de Salvado',
-    'Aceite de Girasol', 'Aceite de Maíz', 'Aceite de Oliva', 'Vinagre Blanco', 'Vinagre de Alcohol',
-    'Tomate Perita', 'Cebolla', 'Papa', 'Zanahoria', 'Lechuga', 'Acelga', 'Zapallito', 'Pimiento',
-    'Carne Molida', 'Asado', 'Pollo Entero', 'Pechuga de Pollo', 'Milanesas', 'Chorizo',
-    'Manzana Roja', 'Banana', 'Naranja', 'Limón', 'Pera', 'Uva', 'Frutilla', 'Durazno',
-    'Coca Cola', 'Pepsi', 'Sprite', 'Fanta', 'Agua Mineral', 'Jugo de Naranja', 'Cerveza',
-    'Arroz', 'Fideos', 'Polenta', 'Avena', 'Quinoa', 'Lentejas', 'Garbanzos'
-  ];
-  const dimensions = ['kg', 'g', 'L', 'mL', 'unidad', 'paquete', 'docena'];
+  const validDimensions = DIMENSIONS.map(d => d.name);
+  const validCategories = CATEGORIES.map(c => c.name);
+  const brands = ['La Serenísima', 'Sancor', 'Mastellone', 'Danone', 'Nestlé', 'Arcor'];
   const qualities: ('Alta' | 'Media' | 'Básica')[] = ['Alta', 'Media', 'Básica'];
 
+  const productTemplates = [
+    { name: 'Leche Entera', category: 'Lácteos', dimension: 'L', sizeRange: [0.5, 2] },
+    { name: 'Leche Descremada', category: 'Lácteos', dimension: 'L', sizeRange: [0.5, 2] },
+    { name: 'Yogur Natural', category: 'Lácteos', dimension: 'g', sizeRange: [150, 500] },
+    { name: 'Queso Cremoso', category: 'Lácteos', dimension: 'kg', sizeRange: [0.2, 1] },
+    { name: 'Manteca', category: 'Lácteos', dimension: 'g', sizeRange: [200, 500] },
+    { name: 'Pan Lactal', category: 'Panadería', dimension: 'C', sizeRange: [1, 2] },
+    { name: 'Pan Integral', category: 'Panadería', dimension: 'kg', sizeRange: [0.5, 1] },
+    { name: 'Aceite de Girasol', category: 'Aceites', dimension: 'L', sizeRange: [0.5, 1.5] },
+    { name: 'Aceite de Oliva', category: 'Aceites', dimension: 'mL', sizeRange: [250, 750] },
+    { name: 'Tomate Perita', category: 'Verduras', dimension: 'kg', sizeRange: [0.5, 2] },
+    { name: 'Cebolla', category: 'Verduras', dimension: 'kg', sizeRange: [1, 3] },
+    { name: 'Papa', category: 'Verduras', dimension: 'kg', sizeRange: [1, 5] },
+    { name: 'Zanahoria', category: 'Verduras', dimension: 'kg', sizeRange: [0.5, 2] },
+    { name: 'Carne Molida', category: 'Carnes', dimension: 'kg', sizeRange: [0.5, 2] },
+    { name: 'Pollo Entero', category: 'Carnes', dimension: 'kg', sizeRange: [1, 3] },
+    { name: 'Manzana Roja', category: 'Frutas', dimension: 'kg', sizeRange: [0.5, 2] },
+    { name: 'Banana', category: 'Frutas', dimension: 'kg', sizeRange: [0.5, 2] },
+    { name: 'Naranja', category: 'Frutas', dimension: 'kg', sizeRange: [1, 3] },
+    { name: 'Coca Cola', category: 'Bebidas', dimension: 'L', sizeRange: [0.5, 2.5] },
+    { name: 'Agua Mineral', category: 'Bebidas', dimension: 'L', sizeRange: [0.5, 2] },
+    { name: 'Arroz', category: 'Cereales', dimension: 'kg', sizeRange: [0.5, 2] },
+    { name: 'Fideos', category: 'Cereales', dimension: 'g', sizeRange: [500, 1000] },
+    { name: 'Azúcar', category: 'Condimentos', dimension: 'kg', sizeRange: [0.5, 2] },
+    { name: 'Sal', category: 'Condimentos', dimension: 'g', sizeRange: [500, 1000] },
+    { name: 'Atún en Lata', category: 'Conservas', dimension: 'g', sizeRange: [150, 300] }
+  ];
+
   for (let i = 0; i < 50; i++) {
-    const name = productNames[Math.floor(Math.random() * productNames.length)];
-    const category = categories[Math.floor(Math.random() * categories.length)];
+    const template = productTemplates[i % productTemplates.length];
     const brand = brands[Math.floor(Math.random() * brands.length)];
-    const dimension = dimensions[Math.floor(Math.random() * dimensions.length)];
-    const size = dimension === 'kg' ? Math.round(Math.random() * 5 + 0.5) : 
-                 dimension === 'g' ? Math.round(Math.random() * 1000 + 100) :
-                 dimension === 'L' ? Math.round(Math.random() * 3 + 0.5) :
-                 dimension === 'mL' ? Math.round(Math.random() * 1000 + 250) :
-                 Math.round(Math.random() * 12 + 1);
+    const size = Math.round((Math.random() * (template.sizeRange[1] - template.sizeRange[0]) + template.sizeRange[0]) * 100) / 100;
     
     products.push({
       id: `current-${i + 1}`,
-      name: `${name} ${brand}`,
-      size,
-      dimension,
-      brand,
+      name: `${template.name} ${brand}`,
+      size: size,
+      dimension: template.dimension,
+      brand: brand,
       price: Math.round((Math.random() * 200 + 10) * 100) / 100,
-      category,
+      category: template.category,
       quality: qualities[Math.floor(Math.random() * qualities.length)],
       deliveryDays: Math.floor(Math.random() * 5) + 1,
       supplierId: 'user-2',
@@ -81,36 +95,57 @@ const generateOtherSuppliersProducts = (): Product[] => {
     { id: 'supplier-10', name: 'Distribuciones Oeste' }
   ];
   
-  const categories = ['Lácteos', 'Panadería', 'Aceites', 'Verduras', 'Carnes', 'Frutas', 'Bebidas', 'Cereales', 'Condimentos', 'Conservas', 'Limpieza', 'Congelados'];
-  const brands = ['La Serenísima', 'Sancor', 'Mastellone', 'Danone', 'Nestlé', 'Arcor', 'Molinos Río de la Plata', 'AGD', 'Bimbo', 'Fargo', 'Unilever', 'P&G', 'Johnson & Johnson'];
+  const validDimensions = DIMENSIONS.map(d => d.name);
+  const validCategories = CATEGORIES.map(c => c.name);
+  const brands = ['La Serenísima', 'Sancor', 'Mastellone', 'Danone', 'Nestlé', 'Arcor', 'Molinos Río de la Plata', 'AGD', 'Bimbo', 'Fargo', 'Unilever', 'P&G'];
   const productTypes = [
     'Leche', 'Yogur', 'Queso', 'Manteca', 'Pan', 'Facturas', 'Aceite', 'Vinagre', 'Tomate', 'Cebolla', 'Papa', 'Zanahoria', 
     'Carne', 'Pollo', 'Pescado', 'Manzana', 'Banana', 'Naranja', 'Gaseosa', 'Agua', 'Jugo', 'Arroz', 'Fideos', 'Sal', 
     'Azúcar', 'Harina', 'Detergente', 'Jabón', 'Shampoo', 'Helado', 'Pizza', 'Hamburguesas'
   ];
-  const dimensions = ['kg', 'g', 'L', 'mL', 'unidad', 'paquete', 'docena', 'caja'];
   const qualities: ('Alta' | 'Media' | 'Básica')[] = ['Alta', 'Media', 'Básica'];
+
+  // Helper function to get appropriate size based on dimension
+  const getSizeForDimension = (dimension: string): number => {
+    switch (dimension) {
+      case 'kg':
+        return Math.round((Math.random() * 4.5 + 0.5) * 100) / 100;
+      case 'g':
+        return Math.round(Math.random() * 900 + 100);
+      case 'L':
+        return Math.round((Math.random() * 2.5 + 0.5) * 100) / 100;
+      case 'mL':
+        return Math.round(Math.random() * 750 + 250);
+      case 'C':
+        return Math.round(Math.random() * 11 + 1);
+      case 'm':
+      case 'cm':
+      case 'mm':
+        return Math.round((Math.random() * 99 + 1) * 100) / 100;
+      case 'm2':
+      case 'm3':
+        return Math.round((Math.random() * 9 + 1) * 100) / 100;
+      default:
+        return 1;
+    }
+  };
 
   for (let i = 0; i < 500; i++) {
     const supplier = suppliers[Math.floor(Math.random() * suppliers.length)];
     const productType = productTypes[Math.floor(Math.random() * productTypes.length)];
-    const category = categories[Math.floor(Math.random() * categories.length)];
+    const category = validCategories[Math.floor(Math.random() * validCategories.length)];
     const brand = brands[Math.floor(Math.random() * brands.length)];
-    const dimension = dimensions[Math.floor(Math.random() * dimensions.length)];
-    const size = dimension === 'kg' ? Math.round((Math.random() * 5 + 0.5) * 100) / 100 : 
-                 dimension === 'g' ? Math.round(Math.random() * 1000 + 100) :
-                 dimension === 'L' ? Math.round((Math.random() * 3 + 0.5) * 100) / 100 :
-                 dimension === 'mL' ? Math.round(Math.random() * 1000 + 250) :
-                 Math.round(Math.random() * 12 + 1);
+    const dimension = validDimensions[Math.floor(Math.random() * validDimensions.length)];
+    const size = getSizeForDimension(dimension);
     
     products.push({
       id: `other-${i + 1}`,
       name: `${productType} ${brand}`,
-      size,
-      dimension,
-      brand,
+      size: size,
+      dimension: dimension,
+      brand: brand,
       price: Math.round((Math.random() * 300 + 5) * 100) / 100,
-      category,
+      category: category,
       quality: qualities[Math.floor(Math.random() * qualities.length)],
       deliveryDays: Math.floor(Math.random() * 7) + 1,
       supplierId: supplier.id,
