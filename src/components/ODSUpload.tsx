@@ -18,39 +18,14 @@ interface ODSUploadProps {
 const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: ODSUploadProps) => {
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const downloadODSTemplate = () => {
-    const headers = [
-      'ID Interno', 'Nombre', 'Tamaño', 'Dimensión', 'Marca', 
-      'Precio', 'Categoría', 'Calidad', 'Días Entrega', 'En Stock'
-    ];
-    
-    // Crear datos de ejemplo para la plantilla ODS
-    const sampleData = [
-      ['', 'Leche Entera', '1', 'L', 'La Serenísima', '85.50', 'Lácteos', 'Alta', '1', 'true'],
-      ['', 'Pan Lactal', '1', 'C', 'Bimbo', '120.00', 'Panadería', 'Media', '2', 'true']
-    ];
-
-    // Generar contenido ODS (simulado como CSV para compatibilidad con navegadores)
-    const odsContent = [headers, ...sampleData]
-      .map(row => row.map(cell => `"${cell}"`).join('\t'))
-      .join('\n');
-
-    const blob = new Blob([odsContent], { type: 'application/vnd.oasis.opendocument.spreadsheet' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'plantilla_productos.ods';
-    a.click();
-    window.URL.revokeObjectURL(url);
-  };
-
   const downloadMyProductsODS = () => {
     const headers = [
-      'ID Interno', 'Nombre', 'Tamaño', 'Dimensión', 'Marca', 
+      'ID', 'ID Interno', 'Nombre', 'Tamaño', 'Dimensión', 'Marca', 
       'Precio', 'Categoría', 'Calidad', 'Días Entrega', 'En Stock'
     ];
     
     const productData = products.map(product => [
+      product.id,
       product.supplierProductId || '',
       product.name,
       product.size.toString(),
@@ -108,10 +83,10 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
         
         const values = line.split('\t').map(v => v.replace(/"/g, '').trim());
         
-        if (values.length < 10) continue;
+        if (values.length < 11) continue;
         
         const [
-          supplierProductId, name, sizeStr, dimension, brand,
+          id, supplierProductId, name, sizeStr, dimension, brand,
           priceStr, category, quality, deliveryDaysStr, inStockStr
         ] = values;
         
@@ -156,15 +131,16 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
           lastUpdated: new Date().toISOString()
         };
         
-        // Si tiene ID interno, buscar producto existente para actualizar
-        if (supplierProductId) {
-          const existingProduct = products.find(p => p.supplierProductId === supplierProductId);
+        // Si tiene ID, buscar producto existente para actualizar
+        if (id) {
+          const existingProduct = products.find(p => p.id === id);
           if (existingProduct) {
-            updatedProducts.push({ id: existingProduct.id, product: productData });
+            updatedProducts.push({ id, product: productData });
             continue;
           }
         }
         
+        // Si no tiene ID o no se encuentra, crear nuevo producto
         processedProducts.push(productData);
       }
       
@@ -175,9 +151,7 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
       
       // Procesar productos actualizados
       if (updatedProducts.length > 0) {
-        updatedProducts.forEach(({ id, product }) => {
-          onUpdate([{ id, product }]);
-        });
+        onUpdate(updatedProducts);
       }
       
       console.log(`Archivo ODS procesado: ${processedProducts.length} nuevos, ${updatedProducts.length} actualizados`);
@@ -193,30 +167,7 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Descargar Plantilla ODS */}
-        <Card className="border-amber-200">
-          <CardHeader>
-            <CardTitle className="flex items-center text-amber-700">
-              <Download className="w-5 h-5 mr-2" />
-              Plantilla ODS
-            </CardTitle>
-            <CardDescription>
-              Descarga la plantilla en formato ODS con ejemplos
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button 
-              variant="outline" 
-              className="w-full border-amber-300 hover:bg-amber-50"
-              onClick={downloadODSTemplate}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Descargar Plantilla ODS
-            </Button>
-          </CardContent>
-        </Card>
-
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Descargar Mis Productos en ODS */}
         <Card className="border-blue-200">
           <CardHeader>
@@ -225,7 +176,7 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
               Mis Productos ODS
             </CardTitle>
             <CardDescription>
-              Descarga todos tus productos en formato ODS
+              Descarga todos tus productos en formato ODS para editar
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -249,7 +200,7 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
               Subir Archivo ODS
             </CardTitle>
             <CardDescription>
-              Sube productos nuevos o actualiza existentes desde ODS
+              Sube el archivo editado para actualizar tus productos
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -279,12 +230,12 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
         <CardContent className="pt-4">
           <h4 className="font-medium mb-2 text-amber-800">Instrucciones para archivos ODS:</h4>
           <ul className="text-sm text-amber-700 space-y-1 ml-4">
+            <li>• <strong>Descarga tus productos:</strong> Usa el botón "Descargar ODS" para obtener tu lista actual</li>
+            <li>• <strong>Edita en LibreOffice/OpenOffice:</strong> Abre el archivo .ods y modifica los datos necesarios</li>
+            <li>• <strong>Mantén el ID:</strong> No elimines la columna ID para que se actualicen correctamente</li>
+            <li>• <strong>Nuevos productos:</strong> Deja la columna ID vacía para crear productos nuevos</li>
+            <li>• <strong>Sube el archivo:</strong> Guarda como .ods y súbelo para aplicar los cambios</li>
             <li>• <strong>Formato exclusivo ODS:</strong> Solo se aceptan archivos .ods (LibreOffice/OpenOffice Calc)</li>
-            <li>• <strong>ID Interno:</strong> Usar para identificar productos existentes y actualizarlos</li>
-            <li>• <strong>Productos nuevos:</strong> Dejar ID Interno vacío para crear nuevos productos</li>
-            <li>• <strong>Actualizar productos:</strong> Usar el mismo ID Interno del producto existente</li>
-            <li>• <strong>Estructura:</strong> El archivo debe mantener el orden de las columnas de la plantilla ODS</li>
-            <li>• <strong>Separadores:</strong> Los datos en ODS se separan automáticamente por pestañas</li>
           </ul>
         </CardContent>
       </Card>
