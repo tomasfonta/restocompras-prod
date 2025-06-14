@@ -25,14 +25,15 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
     category: '',
     quality: 'Media' as 'Alta' | 'Media' | 'Básica',
     deliveryDays: 1,
-    supplierId: 'supplier-1',
-    supplierName: 'Mi Empresa',
+    supplierId: 'user-2',
+    supplierName: 'Lácteos del Valle',
     inStock: true,
     lastUpdated: new Date().toISOString()
   });
 
   useEffect(() => {
     if (initialData) {
+      console.log('Loading initial data:', initialData);
       setFormData({
         name: initialData.name,
         size: initialData.size,
@@ -47,11 +48,28 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
         inStock: initialData.inStock,
         lastUpdated: new Date().toISOString()
       });
+    } else {
+      // Reset form for new product
+      setFormData({
+        name: '',
+        size: 0,
+        dimension: '',
+        brand: '',
+        price: 0,
+        category: '',
+        quality: 'Media',
+        deliveryDays: 1,
+        supplierId: 'user-2',
+        supplierName: 'Lácteos del Valle',
+        inStock: true,
+        lastUpdated: new Date().toISOString()
+      });
     }
   }, [initialData]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Submitting form data:', formData);
     onSubmit(formData);
   };
 
@@ -89,7 +107,7 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
                 type="number"
                 step="0.01"
                 min="0"
-                value={formData.size}
+                value={formData.size || ''}
                 onChange={(e) => setFormData({...formData, size: parseFloat(e.target.value) || 0})}
                 placeholder="Ej: 1, 500, 0.5"
                 required
@@ -97,7 +115,10 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
             </div>
             <div>
               <Label htmlFor="dimension">Dimensión*</Label>
-              <Select value={formData.dimension} onValueChange={(value) => setFormData({...formData, dimension: value})}>
+              <Select 
+                value={formData.dimension} 
+                onValueChange={(value) => setFormData({...formData, dimension: value})}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Unidad" />
                 </SelectTrigger>
@@ -114,7 +135,10 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
 
           <div>
             <Label htmlFor="category">Categoría*</Label>
-            <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
+            <Select 
+              value={formData.category} 
+              onValueChange={(value) => setFormData({...formData, category: value})}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Selecciona una categoría" />
               </SelectTrigger>
@@ -136,7 +160,7 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
               id="price"
               type="number"
               step="0.01"
-              value={formData.price}
+              value={formData.price || ''}
               onChange={(e) => setFormData({...formData, price: parseFloat(e.target.value) || 0})}
               placeholder="0.00"
               required
@@ -145,7 +169,10 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
 
           <div>
             <Label htmlFor="quality">Calidad*</Label>
-            <Select value={formData.quality} onValueChange={(value: 'Alta' | 'Media' | 'Básica') => setFormData({...formData, quality: value})}>
+            <Select 
+              value={formData.quality} 
+              onValueChange={(value: 'Alta' | 'Media' | 'Básica') => setFormData({...formData, quality: value})}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Selecciona calidad" />
               </SelectTrigger>
@@ -163,7 +190,7 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
               id="deliveryDays"
               type="number"
               min="1"
-              value={formData.deliveryDays}
+              value={formData.deliveryDays || ''}
               onChange={(e) => setFormData({...formData, deliveryDays: parseInt(e.target.value) || 1})}
               required
             />

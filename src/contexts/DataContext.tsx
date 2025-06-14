@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Product } from '../types/Product';
 import { Dish } from '../types/Dish';
@@ -20,61 +19,45 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-// Generate sample products for current supplier (user-2)
+// Generate sample products for current supplier (user-2) - Only 10 products
 const generateCurrentSupplierProducts = (): Product[] => {
   const products: Product[] = [];
   const validDimensions = DIMENSIONS.map(d => d.name);
   const validCategories = CATEGORIES.map(c => c.name);
-  const brands = ['La Serenísima', 'Sancor', 'Mastellone', 'Danone', 'Nestlé', 'Arcor'];
+  const brands = ['La Serenísima', 'Sancor', 'Mastellone'];
   const qualities: ('Alta' | 'Media' | 'Básica')[] = ['Alta', 'Media', 'Básica'];
 
   const productTemplates = [
-    { name: 'Leche Entera', category: 'Lácteos', dimension: 'L', sizeRange: [0.5, 2] },
-    { name: 'Leche Descremada', category: 'Lácteos', dimension: 'L', sizeRange: [0.5, 2] },
-    { name: 'Yogur Natural', category: 'Lácteos', dimension: 'g', sizeRange: [150, 500] },
-    { name: 'Queso Cremoso', category: 'Lácteos', dimension: 'kg', sizeRange: [0.2, 1] },
-    { name: 'Manteca', category: 'Lácteos', dimension: 'g', sizeRange: [200, 500] },
-    { name: 'Pan Lactal', category: 'Panadería', dimension: 'C', sizeRange: [1, 2] },
-    { name: 'Pan Integral', category: 'Panadería', dimension: 'kg', sizeRange: [0.5, 1] },
-    { name: 'Aceite de Girasol', category: 'Aceites', dimension: 'L', sizeRange: [0.5, 1.5] },
-    { name: 'Aceite de Oliva', category: 'Aceites', dimension: 'mL', sizeRange: [250, 750] },
-    { name: 'Tomate Perita', category: 'Verduras', dimension: 'kg', sizeRange: [0.5, 2] },
-    { name: 'Cebolla', category: 'Verduras', dimension: 'kg', sizeRange: [1, 3] },
-    { name: 'Papa', category: 'Verduras', dimension: 'kg', sizeRange: [1, 5] },
-    { name: 'Zanahoria', category: 'Verduras', dimension: 'kg', sizeRange: [0.5, 2] },
-    { name: 'Carne Molida', category: 'Carnes', dimension: 'kg', sizeRange: [0.5, 2] },
-    { name: 'Pollo Entero', category: 'Carnes', dimension: 'kg', sizeRange: [1, 3] },
-    { name: 'Manzana Roja', category: 'Frutas', dimension: 'kg', sizeRange: [0.5, 2] },
-    { name: 'Banana', category: 'Frutas', dimension: 'kg', sizeRange: [0.5, 2] },
-    { name: 'Naranja', category: 'Frutas', dimension: 'kg', sizeRange: [1, 3] },
-    { name: 'Coca Cola', category: 'Bebidas', dimension: 'L', sizeRange: [0.5, 2.5] },
-    { name: 'Agua Mineral', category: 'Bebidas', dimension: 'L', sizeRange: [0.5, 2] },
-    { name: 'Arroz', category: 'Cereales', dimension: 'kg', sizeRange: [0.5, 2] },
-    { name: 'Fideos', category: 'Cereales', dimension: 'g', sizeRange: [500, 1000] },
-    { name: 'Azúcar', category: 'Condimentos', dimension: 'kg', sizeRange: [0.5, 2] },
-    { name: 'Sal', category: 'Condimentos', dimension: 'g', sizeRange: [500, 1000] },
-    { name: 'Atún en Lata', category: 'Conservas', dimension: 'g', sizeRange: [150, 300] }
+    { name: 'Leche Entera', category: 'Lácteos', dimension: 'L', size: 1 },
+    { name: 'Leche Descremada', category: 'Lácteos', dimension: 'L', size: 1 },
+    { name: 'Yogur Natural', category: 'Lácteos', dimension: 'g', size: 200 },
+    { name: 'Queso Cremoso', category: 'Lácteos', dimension: 'kg', size: 0.5 },
+    { name: 'Manteca', category: 'Lácteos', dimension: 'g', size: 200 },
+    { name: 'Pan Lactal', category: 'Panadería', dimension: 'C', size: 1 },
+    { name: 'Aceite de Girasol', category: 'Aceites', dimension: 'L', size: 0.9 },
+    { name: 'Tomate Perita', category: 'Verduras', dimension: 'kg', size: 1 },
+    { name: 'Cebolla', category: 'Verduras', dimension: 'kg', size: 1 },
+    { name: 'Papa', category: 'Verduras', dimension: 'kg', size: 2 }
   ];
 
-  for (let i = 0; i < 50; i++) {
-    const template = productTemplates[i % productTemplates.length];
-    const brand = brands[Math.floor(Math.random() * brands.length)];
-    const size = Math.round((Math.random() * (template.sizeRange[1] - template.sizeRange[0]) + template.sizeRange[0]) * 100) / 100;
+  for (let i = 0; i < 10; i++) {
+    const template = productTemplates[i];
+    const brand = brands[i % brands.length];
     
     products.push({
       id: `current-${i + 1}`,
       name: `${template.name} ${brand}`,
-      size: size,
+      size: template.size,
       dimension: template.dimension,
       brand: brand,
-      price: Math.round((Math.random() * 200 + 10) * 100) / 100,
+      price: Math.round((Math.random() * 100 + 20) * 100) / 100,
       category: template.category,
-      quality: qualities[Math.floor(Math.random() * qualities.length)],
-      deliveryDays: Math.floor(Math.random() * 5) + 1,
+      quality: qualities[i % qualities.length],
+      deliveryDays: Math.floor(Math.random() * 3) + 1,
       supplierId: 'user-2',
       supplierName: 'Lácteos del Valle',
-      inStock: Math.random() > 0.1,
-      lastUpdated: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString()
+      inStock: true,
+      lastUpdated: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
     });
   }
   return products;
