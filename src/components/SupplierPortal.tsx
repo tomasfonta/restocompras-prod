@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle, Upload, Download, BarChart3 } from "lucide-react";
+import { PlusCircle, Upload, Download, BarChart3, FileSpreadsheet } from "lucide-react";
 import ProductForm from './ProductForm';
 import ProductTable from './ProductTable';
 import CSVUpload from './CSVUpload';
+import ODSUpload from './ODSUpload';
 import { Product } from '../types/Product';
 import { downloadCSVTemplate } from '../utils/csvTemplate';
 
@@ -14,9 +15,11 @@ interface SupplierPortalProps {
   onAddProduct: (product: Omit<Product, 'id'>) => void;
   onUpdateProduct: (id: string, product: Omit<Product, 'id'>) => void;
   onDeleteProduct: (id: string) => void;
+  supplierId: string;
+  supplierName: string;
 }
 
-const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProduct }: SupplierPortalProps) => {
+const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProduct, supplierId, supplierName }: SupplierPortalProps) => {
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
@@ -35,13 +38,21 @@ const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProdu
     setEditingProduct(null);
   };
 
+  const handleBulkUpload = (newProducts: Omit<Product, 'id'>[]) => {
+    newProducts.forEach(product => onAddProduct(product));
+  };
+
+  const handleBulkUpdate = (updates: { id: string; product: Omit<Product, 'id'> }[]) => {
+    updates.forEach(({ id, product }) => onUpdateProduct(id, product));
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Management Tabs */}
       <Tabs defaultValue="products" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-gray-100">
+        <TabsList className="grid w-full grid-cols-4 bg-gray-100">
           <TabsTrigger value="products" className="data-[state=active]:bg-white">Gestión de Productos</TabsTrigger>
-          <TabsTrigger value="bulk" className="data-[state=active]:bg-white">Carga Masiva</TabsTrigger>
+          <TabsTrigger value="bulk" className="data-[state=active]:bg-white">Carga CSV</TabsTrigger>
+          <TabsTrigger value="ods" className="data-[state=active]:bg-white">Carga ODS</TabsTrigger>
           <TabsTrigger value="analytics" className="data-[state=active]:bg-white">Análisis</TabsTrigger>
         </TabsList>
 
@@ -130,6 +141,21 @@ const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProdu
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="ods" className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">Gestión con ODS</h2>
+            <p className="text-gray-600">Sube, descarga y actualiza productos usando archivos ODS/CSV</p>
+          </div>
+
+          <ODSUpload
+            products={products}
+            onUpload={handleBulkUpload}
+            onUpdate={handleBulkUpdate}
+            supplierId={supplierId}
+            supplierName={supplierName}
+          />
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">

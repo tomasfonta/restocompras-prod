@@ -11,6 +11,7 @@ export interface Product {
   deliveryDays: number;
   supplierId: string;
   supplierName: string;
+  supplierProductId?: string; // Identificación del proveedor (no visible en tablas)
   inStock: boolean;
   lastUpdated: string;
 }

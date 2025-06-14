@@ -63,6 +63,8 @@ const Index = () => {
             onAddProduct={handleAddProduct}
             onUpdateProduct={handleUpdateProduct}
             onDeleteProduct={deleteProduct}
+            supplierId={currentUser.id}
+            supplierName={currentUser.companyName}
           />
         ) : (
           <BuyerPortal products={products} />
