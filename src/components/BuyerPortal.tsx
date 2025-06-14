@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Filter, ShoppingCart, TrendingUp, Package, ChefHat, Plus } from "lucide-react";
+import { Search, Filter } from "lucide-react";
 import ProductTable from './ProductTable';
 import SupplierProfile from './SupplierProfile';
 import MenuManagement from './MenuManagement';
@@ -38,10 +38,6 @@ const BuyerPortal = ({ products }: BuyerPortalProps) => {
     });
   }, [products, searchTerm, selectedCategory, priceFilter]);
 
-  // Calculate stats
-  const totalProducts = filteredProducts.length;
-  const suppliersCount = new Set(filteredProducts.map(p => p.supplierId)).size;
-
   if (selectedSupplier) {
     return (
       <SupplierProfile 
@@ -54,52 +50,6 @@ const BuyerPortal = ({ products }: BuyerPortalProps) => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-8 border border-amber-200">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Encuentra los mejores productos para tu restaurante
-            </h1>
-            <p className="text-gray-600 text-lg">
-              Compara precios, calidad y tiempos de entrega de múltiples proveedores
-            </p>
-          </div>
-          <div className="hidden md:block">
-            <ShoppingCart className="w-20 h-20 text-amber-600" />
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-2xl font-bold text-gray-900">{totalProducts}</CardTitle>
-            <CardDescription className="text-gray-600">Productos Disponibles</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center text-sm text-gray-500">
-              <Package className="w-4 h-4 mr-1" />
-              En stock
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-purple-500">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-2xl font-bold text-gray-900">{suppliersCount}</CardTitle>
-            <CardDescription className="text-gray-600">Proveedores Activos</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center text-sm text-gray-500">
-              <Package className="w-4 h-4 mr-1" />
-              Disponibles
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Management Tabs */}
       <Tabs defaultValue="catalog" className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-gray-100">

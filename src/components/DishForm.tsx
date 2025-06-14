@@ -22,18 +22,6 @@ const DISH_CATEGORIES = [
   'Bebidas'
 ];
 
-const INGREDIENT_CATEGORIES = [
-  'Base',
-  'Proteína',
-  'Verduras',
-  'Queso',
-  'Salsa',
-  'Condimentos',
-  'Hierbas',
-  'Aderezo',
-  'Otros'
-];
-
 const UNITS = ['g', 'kg', 'ml', 'L', 'unidad', 'porción', 'pizca', 'cucharada', 'taza', 'hojas'];
 
 interface DishFormProps {
@@ -111,33 +99,15 @@ const DishForm = ({ initialData, onSubmit, onCancel }: DishFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Basic Information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Nombre del Plato</Label>
-          <Input
-            id="name"
-            value={formData.name}
-            onChange={(e) => handleInputChange('name', e.target.value)}
-            placeholder="Ej: Pizza Margherita"
-            required
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="category">Categoría</Label>
-          <Select value={formData.category} onValueChange={(value) => handleInputChange('category', value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Seleccionar categoría" />
-            </SelectTrigger>
-            <SelectContent className="bg-white">
-              {DISH_CATEGORIES.map(category => (
-                <SelectItem key={category} value={category}>
-                  {category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div className="space-y-2">
+        <Label htmlFor="name">Nombre del Plato</Label>
+        <Input
+          id="name"
+          value={formData.name}
+          onChange={(e) => handleInputChange('name', e.target.value)}
+          placeholder="Ej: Pizza Margherita"
+          required
+        />
       </div>
 
       <div className="space-y-2">
@@ -207,7 +177,7 @@ const DishForm = ({ initialData, onSubmit, onCancel }: DishFormProps) => {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Add New Ingredient */}
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-2 p-4 bg-gray-50 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-2 p-4 bg-gray-50 rounded-lg">
             <Input
               placeholder="Nombre del ingrediente"
               value={newIngredient.name}
@@ -229,33 +199,25 @@ const DishForm = ({ initialData, onSubmit, onCancel }: DishFormProps) => {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={newIngredient.category} onValueChange={(value) => setNewIngredient(prev => ({ ...prev, category: value }))}>
-              <SelectTrigger>
-                <SelectValue placeholder="Categoría" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                {INGREDIENT_CATEGORIES.map(category => (
-                  <SelectItem key={category} value={category}>{category}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input
-              type="number"
-              placeholder="Costo"
-              value={newIngredient.cost || ''}
-              onChange={(e) => setNewIngredient(prev => ({ ...prev, cost: parseFloat(e.target.value) || 0 }))}
-              step="0.01"
-            />
-            <Button type="button" onClick={handleAddIngredient} size="sm">
-              <Plus className="w-4 h-4" />
-            </Button>
+            <div className="flex space-x-2">
+              <Input
+                type="number"
+                placeholder="Costo"
+                value={newIngredient.cost || ''}
+                onChange={(e) => setNewIngredient(prev => ({ ...prev, cost: parseFloat(e.target.value) || 0 }))}
+                step="0.01"
+              />
+              <Button type="button" onClick={handleAddIngredient} size="sm">
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
           {/* Ingredients List */}
           <div className="space-y-2">
             {ingredients.map((ingredient) => (
               <div key={ingredient.id} className="flex items-center space-x-2 p-3 border rounded-lg">
-                <div className="flex-1 grid grid-cols-1 md:grid-cols-5 gap-2">
+                <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-2">
                   <Input
                     value={ingredient.name}
                     onChange={(e) => handleUpdateIngredient(ingredient.id, 'name', e.target.value)}
@@ -282,19 +244,6 @@ const DishForm = ({ initialData, onSubmit, onCancel }: DishFormProps) => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Select 
-                    value={ingredient.category} 
-                    onValueChange={(value) => handleUpdateIngredient(ingredient.id, 'category', value)}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {INGREDIENT_CATEGORIES.map(category => (
-                        <SelectItem key={category} value={category}>{category}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                   <Input
                     type="number"
                     value={ingredient.cost || ''}
@@ -302,9 +251,6 @@ const DishForm = ({ initialData, onSubmit, onCancel }: DishFormProps) => {
                     placeholder="Costo"
                     step="0.01"
                   />
-                  <Badge variant="outline" className="self-center">
-                    {ingredient.category}
-                  </Badge>
                 </div>
                 <Button
                   type="button"

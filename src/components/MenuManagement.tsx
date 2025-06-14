@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import DishForm from './DishForm';
 import { Dish } from '../types/Dish';
 
-// Sample data for dishes
+// Sample data for dishes - removing category from sample data
 const sampleDishes: Dish[] = [
   {
     id: '1',
@@ -91,54 +91,8 @@ const MenuManagement = () => {
     return dish.ingredients.reduce((total, ingredient) => total + (ingredient.cost || 0), 0);
   };
 
-  const totalDishes = dishes.length;
-  const activeDishes = dishes.filter(d => d.isActive).length;
-  const avgPrice = dishes.length > 0 ? dishes.reduce((sum, d) => sum + d.price, 0) / dishes.length : 0;
-
   return (
     <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-2xl font-bold text-gray-900">{totalDishes}</CardTitle>
-            <CardDescription className="text-gray-600">Total de Platos</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center text-sm text-gray-500">
-              <ChefHat className="w-4 h-4 mr-1" />
-              En menú
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-2xl font-bold text-gray-900">{activeDishes}</CardTitle>
-            <CardDescription className="text-gray-600">Platos Activos</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center text-sm text-gray-500">
-              <ChefHat className="w-4 h-4 mr-1" />
-              Disponibles
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-amber-500">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-2xl font-bold text-gray-900">${avgPrice.toFixed(0)}</CardTitle>
-            <CardDescription className="text-gray-600">Precio Promedio</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center text-sm text-gray-500">
-              <DollarSign className="w-4 h-4 mr-1" />
-              Por plato
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -241,12 +195,6 @@ const MenuManagement = () => {
                   <span className="text-gray-600">Costo estimado:</span>
                   <span className="font-medium text-green-600">${calculateDishCost(dish)}</span>
                 </div>
-              </div>
-
-              <div className="pt-2 border-t">
-                <p className="text-xs text-gray-500">
-                  Categoría: <span className="font-medium">{dish.category}</span>
-                </p>
               </div>
             </CardContent>
           </Card>
