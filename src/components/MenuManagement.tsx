@@ -1,48 +1,30 @@
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Search, Edit, Trash2, ChefHat, Clock, DollarSign } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import DishForm from './DishForm';
+import { Plus, Edit, Trash2, Clock, DollarSign } from "lucide-react";
 import { Dish } from '../types/Dish';
 import { useUser } from '../contexts/UserContext';
+import DishForm from './DishForm';
 
-// Sample data for dishes
+// Sample dishes for demo
 const sampleDishes: Dish[] = [
   {
-    id: '1',
-    name: 'Pizza Margherita',
-    description: 'Pizza clásica con tomate, mozzarella y albahaca fresca',
-    price: 850,
-    preparationTime: 15,
+    id: 'dish-1',
+    name: 'Pasta Carbonara',
+    description: 'Deliciosa pasta con salsa carbonara, bacon y queso parmesano',
+    price: 25.99,
+    preparationTime: 20,
     isActive: true,
     userId: 'user-1',
     createdAt: '2024-06-01T10:00:00Z',
     updatedAt: '2024-06-01T10:00:00Z',
     ingredients: [
-      { id: '1', name: 'Masa de pizza', quantity: 1, unit: 'porción', cost: 50 },
-      { id: '2', name: 'Salsa de tomate', quantity: 100, unit: 'ml', cost: 30 },
-      { id: '3', name: 'Mozzarella', quantity: 150, unit: 'g', cost: 120 },
-      { id: '4', name: 'Albahaca', quantity: 5, unit: 'hojas', cost: 10 }
-    ]
-  },
-  {
-    id: '2',
-    name: 'Ensalada César',
-    description: 'Lechuga romana, pollo grillado, parmesano y aderezo césar',
-    category: 'Ensaladas',
-    price: 650,
-    preparationTime: 10,
-    isActive: true,
-    createdAt: '2024-06-02T11:00:00Z',
-    updatedAt: '2024-06-02T11:00:00Z',
-    ingredients: [
-      { id: '5', name: 'Lechuga romana', quantity: 200, unit: 'g', category: 'Verduras', cost: 40 },
-      { id: '6', name: 'Pechuga de pollo', quantity: 150, unit: 'g', category: 'Proteína', cost: 180 },
-      { id: '7', name: 'Queso parmesano', quantity: 50, unit: 'g', category: 'Queso', cost: 80 },
-      { id: '8', name: 'Aderezo césar', quantity: 50, unit: 'ml', category: 'Aderezo', cost: 25 }
+      { id: 'ing-1', name: 'Pasta', quantity: 200, unit: 'g', cost: 2.50 },
+      { id: 'ing-2', name: 'Bacon', quantity: 100, unit: 'g', cost: 5.00 },
+      { id: 'ing-3', name: 'Huevos', quantity: 2, unit: 'unidades', cost: 1.00 },
+      { id: 'ing-4', name: 'Queso Parmesano', quantity: 50, unit: 'g', cost: 3.00 }
     ]
   }
 ];
@@ -50,174 +32,137 @@ const sampleDishes: Dish[] = [
 const MenuManagement = () => {
   const { currentUser } = useUser();
   const [dishes, setDishes] = useState<Dish[]>(sampleDishes);
-  const [showDishForm, setShowDishForm] = useState(false);
-  const [editingDish, setEditingDish] = useState<Dish | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [showForm, setShowForm] = useState(false);
+  const [editingDish, setEditingDish] = useState<Dish | undefined>();
 
   // Filter dishes by current user
   const userDishes = dishes.filter(dish => dish.userId === currentUser?.id);
-  const filteredDishes = userDishes.filter(dish =>
-    dish.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dish.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
 
-  const handleAddDish = (dishData: Omit<Dish, 'id' | 'createdAt' | 'updatedAt' | 'userId'>) => {
-    if (!currentUser) return;
-    
-    const newDish: Dish = {
-      ...dishData,
-      id: Date.now().toString(),
-      userId: currentUser.id,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    setDishes(prev => [...prev, newDish]);
-    setShowDishForm(false);
-  };
-
-  const handleUpdateDish = (id: string, dishData: Omit<Dish, 'id' | 'createdAt' | 'updatedAt' | 'userId'>) => {
-    if (!currentUser) return;
-    
-    setDishes(prev => prev.map(d => 
-      d.id === id 
-        ? { ...dishData, id, userId: currentUser.id, createdAt: d.createdAt, updatedAt: new Date().toISOString() }
-        : d
-    ));
-    setShowDishForm(false);
-    setEditingDish(null);
+  const handleAddDish = () => {
+    setEditingDish(undefined);
+    setShowForm(true);
   };
 
   const handleEditDish = (dish: Dish) => {
     setEditingDish(dish);
-    setShowDishForm(true);
+    setShowForm(true);
   };
 
-  const handleDeleteDish = (id: string) => {
-    setDishes(prev => prev.filter(d => d.id !== id));
+  const handleDeleteDish = (dishId: string) => {
+    setDishes(dishes.filter(dish => dish.id !== dishId));
   };
 
-  const calculateDishCost = (dish: Dish) => {
-    return dish.ingredients.reduce((total, ingredient) => total + (ingredient.cost || 0), 0);
+  const handleSaveDish = (dishData: Omit<Dish, 'id' | 'createdAt' | 'updatedAt'>) => {
+    if (editingDish) {
+      // Update existing dish
+      setDishes(dishes.map(dish => 
+        dish.id === editingDish.id 
+          ? { ...dish, ...dishData, updatedAt: new Date().toISOString() }
+          : dish
+      ));
+    } else {
+      // Add new dish
+      const newDish: Dish = {
+        ...dishData,
+        id: Date.now().toString(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      setDishes([...dishes, newDish]);
+    }
+    setShowForm(false);
+    setEditingDish(undefined);
   };
+
+  const handleCancelForm = () => {
+    setShowForm(false);
+    setEditingDish(undefined);
+  };
+
+  if (showForm) {
+    return (
+      <DishForm
+        dish={editingDish}
+        onSave={handleSaveDish}
+        onCancel={handleCancelForm}
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
-        <div>
-          <h3 className="text-xl font-bold text-gray-900">Mis Platos</h3>
-          <p className="text-gray-600">Gestiona los platos de tu menú</p>
-        </div>
-        <Button 
-          onClick={() => setShowDishForm(true)}
-          className="bg-amber-600 hover:bg-amber-700 text-white"
-        >
+        <h2 className="text-2xl font-bold text-gray-900">Mi Menú</h2>
+        <Button onClick={handleAddDish} className="bg-amber-600 hover:bg-amber-700">
           <Plus className="w-4 h-4 mr-2" />
-          Nuevo Plato
+          Agregar Plato
         </Button>
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-        <Input
-          placeholder="Buscar platos..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
-        />
-      </div>
-
-      {/* Dish Form */}
-      {showDishForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{editingDish ? 'Editar Plato' : 'Nuevo Plato'}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <DishForm
-              initialData={editingDish}
-              onSubmit={editingDish 
-                ? (data) => handleUpdateDish(editingDish.id, data)
-                : handleAddDish
-              }
-              onCancel={() => {
-                setShowDishForm(false);
-                setEditingDish(null);
-              }}
-            />
-          </CardContent>
-        </Card>
-      )}
-
       {/* Dishes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredDishes.map((dish) => (
-          <Card key={dish.id} className="hover:shadow-md transition-shadow">
+        {userDishes.map((dish) => (
+          <Card key={dish.id} className="hover:shadow-lg transition-shadow">
             <CardHeader className="pb-3">
               <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-lg">{dish.name}</CardTitle>
-                  <Badge 
-                    variant={dish.isActive ? "default" : "secondary"}
-                    className={dish.isActive ? "bg-green-500" : ""}
-                  >
-                    {dish.isActive ? 'Activo' : 'Inactivo'}
-                  </Badge>
-                </div>
-                <div className="flex space-x-1">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleEditDish(dish)}
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => handleDeleteDish(dish.id)}
-                    className="text-red-600 hover:bg-red-50"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                <CardTitle className="text-lg">{dish.name}</CardTitle>
+                <Badge variant={dish.isActive ? "default" : "secondary"}>
+                  {dish.isActive ? 'Activo' : 'Inactivo'}
+                </Badge>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <p className="text-sm text-gray-600">{dish.description}</p>
+            <CardContent className="space-y-4">
+              <p className="text-gray-600 text-sm">{dish.description}</p>
               
               <div className="flex justify-between items-center">
-                <span className="font-bold text-lg text-amber-600">${dish.price}</span>
-                <div className="flex items-center text-sm text-gray-500">
-                  <Clock className="w-4 h-4 mr-1" />
-                  {dish.preparationTime} min
+                <div className="flex items-center space-x-2">
+                  <DollarSign className="w-4 h-4 text-green-600" />
+                  <span className="font-semibold text-green-600">${dish.price}</span>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Clock className="w-4 h-4 text-blue-600" />
+                  <span className="text-sm text-blue-600">{dish.preparationTime}min</span>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Ingredientes:</span>
-                  <span className="font-medium">{dish.ingredients.length}</span>
+                <h4 className="text-sm font-medium text-gray-700">Ingredientes:</h4>
+                <div className="text-xs text-gray-600">
+                  {dish.ingredients.map(ing => ing.name).join(', ')}
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Costo estimado:</span>
-                  <span className="font-medium text-green-600">${calculateDishCost(dish)}</span>
-                </div>
+              </div>
+
+              <div className="flex justify-end space-x-2 pt-3 border-t">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleEditDish(dish)}
+                >
+                  <Edit className="w-4 h-4 mr-1" />
+                  Editar
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => handleDeleteDish(dish.id)}
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  Eliminar
+                </Button>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {filteredDishes.length === 0 && (
+      {userDishes.length === 0 && (
         <Card>
-          <CardContent className="py-16 text-center">
-            <ChefHat className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay platos</h3>
-            <p className="text-gray-600">
-              {searchTerm ? 'No se encontraron platos que coincidan con tu búsqueda' : 'Agrega tu primer plato al menú'}
-            </p>
+          <CardContent className="py-12 text-center">
+            <p className="text-gray-600 mb-4">No tienes platos en tu menú aún</p>
+            <Button onClick={handleAddDish} className="bg-amber-600 hover:bg-amber-700">
+              <Plus className="w-4 h-4 mr-2" />
+              Agregar tu primer plato
+            </Button>
           </CardContent>
         </Card>
       )}
