@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import SupplierPortal from '../components/SupplierPortal';
 import BuyerPortal from '../components/BuyerPortal';
 import { Product } from '../types/Product';
+import { useUser } from '../contexts/UserContext';
 
 // Sample data
 const sampleProducts: Product[] = [
@@ -18,7 +19,7 @@ const sampleProducts: Product[] = [
     category: 'Lácteos',
     quality: 'Alta',
     deliveryDays: 2,
-    supplierId: 'supplier-1',
+    supplierId: 'user-2',
     supplierName: 'Lácteos del Valle',
     inStock: true,
     lastUpdated: '2024-06-13T10:00:00Z'
@@ -101,50 +102,56 @@ const sampleProducts: Product[] = [
 ];
 
 const Index = () => {
-  const location = useLocation();
   const navigate = useNavigate();
-  const [userType, setUserType] = useState<'supplier' | 'buyer'>('buyer');
+  const { currentUser } = useUser();
   const [products, setProducts] = useState<Product[]>(sampleProducts);
 
   useEffect(() => {
-    // Obtener el tipo de usuario desde el state del login o usar valor por defecto
-    if (location.state?.userType) {
-      setUserType(location.state.userType);
+    if (!currentUser) {
+      navigate('/login');
     }
-  }, [location.state]);
+  }, [currentUser, navigate]);
 
-  const handleLogout = () => {
-    navigate('/');
-  };
+  if (!currentUser) {
+    return null;
+  }
 
   const handleAddProduct = (productData: Omit<Product, 'id'>) => {
     const newProduct: Product = {
       ...productData,
       id: Date.now().toString(),
+      supplierId: currentUser.id,
+      supplierName: currentUser.companyName,
     };
     setProducts(prev => [...prev, newProduct]);
   };
 
   const handleUpdateProduct = (id: string, productData: Omit<Product, 'id'>) => {
-    setProducts(prev => prev.map(p => p.id === id ? { ...productData, id } : p));
+    setProducts(prev => prev.map(p => p.id === id ? { 
+      ...productData, 
+      id,
+      supplierId: currentUser.id,
+      supplierName: currentUser.companyName
+    } : p));
   };
 
   const handleDeleteProduct = (id: string) => {
     setProducts(prev => prev.filter(p => p.id !== id));
   };
 
+  // Filter products for supplier view
+  const userProducts = currentUser.userType === 'supplier' 
+    ? products.filter(p => p.supplierId === currentUser.id)
+    : products;
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header 
-        userType={userType} 
-        onUserTypeChange={setUserType}
-        onLogout={handleLogout}
-      />
+      <Header />
       
       <main>
-        {userType === 'supplier' ? (
+        {currentUser.userType === 'supplier' ? (
           <SupplierPortal 
-            products={products.filter(p => p.supplierId === 'supplier-1')}
+            products={userProducts}
             onAddProduct={handleAddProduct}
             onUpdateProduct={handleUpdateProduct}
             onDeleteProduct={handleDeleteProduct}

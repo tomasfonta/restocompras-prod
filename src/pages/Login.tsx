@@ -1,21 +1,42 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Mail, Lock, User, Building } from "lucide-react";
+import { ArrowLeft, Mail, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from '../contexts/UserContext';
+import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userType, setUserType] = useState<'supplier' | 'buyer'>('buyer');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useUser();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Redirect to dashboard with user type
-    navigate('/dashboard', { state: { userType } });
+    setIsLoading(true);
+    
+    const success = login(email, password);
+    
+    if (success) {
+      toast({
+        title: "Inicio de sesión exitoso",
+        description: "Bienvenido de vuelta",
+      });
+      navigate('/dashboard');
+    } else {
+      toast({
+        title: "Error de autenticación",
+        description: "Email o contraseña incorrectos",
+        variant: "destructive",
+      });
+    }
+    
+    setIsLoading(false);
   };
 
   return (
@@ -45,37 +66,6 @@ const Login = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* User Type Selection */}
-            <div className="space-y-3">
-              <Label className="text-sm font-medium text-gray-700">Tipo de Usuario</Label>
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setUserType('buyer')}
-                  className={`flex items-center justify-center p-3 rounded-lg border-2 transition-all ${
-                    userType === 'buyer'
-                      ? 'border-amber-500 bg-amber-50 text-amber-700'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <User className="w-4 h-4 mr-2" />
-                  <span className="text-sm font-medium">Restaurante</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setUserType('supplier')}
-                  className={`flex items-center justify-center p-3 rounded-lg border-2 transition-all ${
-                    userType === 'supplier'
-                      ? 'border-amber-500 bg-amber-50 text-amber-700'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <Building className="w-4 h-4 mr-2" />
-                  <span className="text-sm font-medium">Proveedor</span>
-                </button>
-              </div>
-            </div>
-
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -116,8 +106,9 @@ const Login = () => {
               <Button 
                 type="submit" 
                 className="w-full bg-amber-600 hover:bg-amber-700 text-white py-2.5"
+                disabled={isLoading}
               >
-                Ingresar
+                {isLoading ? 'Ingresando...' : 'Ingresar'}
               </Button>
             </form>
 
@@ -142,10 +133,12 @@ const Login = () => {
         <Card className="mt-6 bg-amber-50 border-amber-200">
           <CardContent className="pt-6">
             <div className="text-center">
-              <h3 className="font-semibold text-amber-800 mb-2">Modo Demo</h3>
-              <p className="text-amber-700 text-sm">
-                Puedes ingresar con cualquier email y contraseña para probar la plataforma
-              </p>
+              <h3 className="font-semibold text-amber-800 mb-2">Usuarios Demo</h3>
+              <div className="text-amber-700 text-sm space-y-2">
+                <p><strong>Restaurante:</strong> admin@elbuensabor.com</p>
+                <p><strong>Proveedor:</strong> ventas@lacteosdevalle.com</p>
+                <p><strong>Contraseña:</strong> password123</p>
+              </div>
             </div>
           </CardContent>
         </Card>

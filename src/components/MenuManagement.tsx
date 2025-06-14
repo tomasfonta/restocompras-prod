@@ -7,24 +7,25 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import DishForm from './DishForm';
 import { Dish } from '../types/Dish';
+import { useUser } from '../contexts/UserContext';
 
-// Sample data for dishes - removing category from sample data
+// Sample data for dishes
 const sampleDishes: Dish[] = [
   {
     id: '1',
     name: 'Pizza Margherita',
     description: 'Pizza clásica con tomate, mozzarella y albahaca fresca',
-    category: 'Pizzas',
     price: 850,
     preparationTime: 15,
     isActive: true,
+    userId: 'user-1',
     createdAt: '2024-06-01T10:00:00Z',
     updatedAt: '2024-06-01T10:00:00Z',
     ingredients: [
-      { id: '1', name: 'Masa de pizza', quantity: 1, unit: 'porción', category: 'Base', cost: 50 },
-      { id: '2', name: 'Salsa de tomate', quantity: 100, unit: 'ml', category: 'Salsa', cost: 30 },
-      { id: '3', name: 'Mozzarella', quantity: 150, unit: 'g', category: 'Queso', cost: 120 },
-      { id: '4', name: 'Albahaca', quantity: 5, unit: 'hojas', category: 'Hierbas', cost: 10 }
+      { id: '1', name: 'Masa de pizza', quantity: 1, unit: 'porción', cost: 50 },
+      { id: '2', name: 'Salsa de tomate', quantity: 100, unit: 'ml', cost: 30 },
+      { id: '3', name: 'Mozzarella', quantity: 150, unit: 'g', cost: 120 },
+      { id: '4', name: 'Albahaca', quantity: 5, unit: 'hojas', cost: 10 }
     ]
   },
   {
@@ -47,20 +48,26 @@ const sampleDishes: Dish[] = [
 ];
 
 const MenuManagement = () => {
+  const { currentUser } = useUser();
   const [dishes, setDishes] = useState<Dish[]>(sampleDishes);
   const [showDishForm, setShowDishForm] = useState(false);
   const [editingDish, setEditingDish] = useState<Dish | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredDishes = dishes.filter(dish =>
+  // Filter dishes by current user
+  const userDishes = dishes.filter(dish => dish.userId === currentUser?.id);
+  const filteredDishes = userDishes.filter(dish =>
     dish.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     dish.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleAddDish = (dishData: Omit<Dish, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleAddDish = (dishData: Omit<Dish, 'id' | 'createdAt' | 'updatedAt' | 'userId'>) => {
+    if (!currentUser) return;
+    
     const newDish: Dish = {
       ...dishData,
       id: Date.now().toString(),
+      userId: currentUser.id,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -68,10 +75,12 @@ const MenuManagement = () => {
     setShowDishForm(false);
   };
 
-  const handleUpdateDish = (id: string, dishData: Omit<Dish, 'id' | 'createdAt' | 'updatedAt'>) => {
+  const handleUpdateDish = (id: string, dishData: Omit<Dish, 'id' | 'createdAt' | 'updatedAt' | 'userId'>) => {
+    if (!currentUser) return;
+    
     setDishes(prev => prev.map(d => 
       d.id === id 
-        ? { ...dishData, id, createdAt: d.createdAt, updatedAt: new Date().toISOString() }
+        ? { ...dishData, id, userId: currentUser.id, createdAt: d.createdAt, updatedAt: new Date().toISOString() }
         : d
     ));
     setShowDishForm(false);
