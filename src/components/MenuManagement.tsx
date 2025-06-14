@@ -6,37 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Plus, Edit, Trash2, Clock, DollarSign } from "lucide-react";
 import { Dish } from '../types/Dish';
 import { useUser } from '../contexts/UserContext';
+import { useData } from '../contexts/DataContext';
 import DishForm from './DishForm';
-
-// Sample dishes for demo
-const sampleDishes: Dish[] = [
-  {
-    id: 'dish-1',
-    name: 'Pasta Carbonara',
-    description: 'Deliciosa pasta con salsa carbonara, bacon y queso parmesano',
-    price: 25.99,
-    preparationTime: 20,
-    isActive: true,
-    userId: 'user-1',
-    createdAt: '2024-06-01T10:00:00Z',
-    updatedAt: '2024-06-01T10:00:00Z',
-    ingredients: [
-      { id: 'ing-1', name: 'Pasta', quantity: 200, unit: 'g', cost: 2.50 },
-      { id: 'ing-2', name: 'Bacon', quantity: 100, unit: 'g', cost: 5.00 },
-      { id: 'ing-3', name: 'Huevos', quantity: 2, unit: 'unidades', cost: 1.00 },
-      { id: 'ing-4', name: 'Queso Parmesano', quantity: 50, unit: 'g', cost: 3.00 }
-    ]
-  }
-];
 
 const MenuManagement = () => {
   const { currentUser } = useUser();
-  const [dishes, setDishes] = useState<Dish[]>(sampleDishes);
+  const { getDishesByUser, addDish, updateDish, deleteDish } = useData();
   const [showForm, setShowForm] = useState(false);
   const [editingDish, setEditingDish] = useState<Dish | undefined>();
 
-  // Filter dishes by current user
-  const userDishes = dishes.filter(dish => dish.userId === currentUser?.id);
+  // Get dishes for current user
+  const userDishes = currentUser ? getDishesByUser(currentUser.id) : [];
 
   const handleAddDish = () => {
     setEditingDish(undefined);
@@ -49,26 +29,16 @@ const MenuManagement = () => {
   };
 
   const handleDeleteDish = (dishId: string) => {
-    setDishes(dishes.filter(dish => dish.id !== dishId));
+    deleteDish(dishId);
   };
 
   const handleSaveDish = (dishData: Omit<Dish, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (editingDish) {
       // Update existing dish
-      setDishes(dishes.map(dish => 
-        dish.id === editingDish.id 
-          ? { ...dish, ...dishData, updatedAt: new Date().toISOString() }
-          : dish
-      ));
+      updateDish(editingDish.id, dishData);
     } else {
       // Add new dish
-      const newDish: Dish = {
-        ...dishData,
-        id: Date.now().toString(),
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      setDishes([...dishes, newDish]);
+      addDish(dishData);
     }
     setShowForm(false);
     setEditingDish(undefined);
