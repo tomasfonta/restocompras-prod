@@ -1,6 +1,8 @@
 
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import { BarChart3 } from "lucide-react";
 import Header from '../components/Header';
 import SupplierPortal from '../components/SupplierPortal';
 import BuyerPortal from '../components/BuyerPortal';
@@ -55,6 +57,21 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
+      
+      {/* Cost Analysis Button for Restaurants */}
+      {currentUser.userType === 'restaurant' && (
+        <div className="max-w-7xl mx-auto p-6 pb-0">
+          <div className="flex justify-end">
+            <Button 
+              onClick={() => navigate('/cost-analysis')}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              <BarChart3 className="w-4 h-4 mr-2" />
+              Análisis de Costos
+            </Button>
+          </div>
+        </div>
+      )}
       
       <main>
         {currentUser.userType === 'supplier' ? (
