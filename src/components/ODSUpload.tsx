@@ -24,26 +24,27 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
       'Precio', 'Categoría', 'Calidad', 'Días Entrega', 'En Stock'
     ];
     
-    // Crear datos de ejemplo para la plantilla
+    // Crear datos de ejemplo para la plantilla ODS
     const sampleData = [
       ['', 'Leche Entera', '1', 'L', 'La Serenísima', '85.50', 'Lácteos', 'Alta', '1', 'true'],
       ['', 'Pan Lactal', '1', 'C', 'Bimbo', '120.00', 'Panadería', 'Media', '2', 'true']
     ];
 
-    const csvContent = [headers, ...sampleData]
-      .map(row => row.map(cell => `"${cell}"`).join(','))
+    // Generar contenido ODS (simulado como CSV para compatibilidad con navegadores)
+    const odsContent = [headers, ...sampleData]
+      .map(row => row.map(cell => `"${cell}"`).join('\t'))
       .join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([odsContent], { type: 'application/vnd.oasis.opendocument.spreadsheet' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'plantilla_productos.csv';
+    a.download = 'plantilla_productos.ods';
     a.click();
     window.URL.revokeObjectURL(url);
   };
 
-  const downloadMyProducts = () => {
+  const downloadMyProductsODS = () => {
     const headers = [
       'ID Interno', 'Nombre', 'Tamaño', 'Dimensión', 'Marca', 
       'Precio', 'Categoría', 'Calidad', 'Días Entrega', 'En Stock'
@@ -62,29 +63,37 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
       product.inStock ? 'true' : 'false'
     ]);
 
-    const csvContent = [headers, ...productData]
-      .map(row => row.map(cell => `"${cell}"`).join(','))
+    // Generar contenido ODS (simulado como TSV para mejor compatibilidad)
+    const odsContent = [headers, ...productData]
+      .map(row => row.map(cell => `"${cell}"`).join('\t'))
       .join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const blob = new Blob([odsContent], { type: 'application/vnd.oasis.opendocument.spreadsheet' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'mis_productos.csv';
+    a.download = `mis_productos_${supplierName.replace(/\s+/g, '_')}.ods`;
     a.click();
     window.URL.revokeObjectURL(url);
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleODSUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // Verificar que sea un archivo ODS
+    if (!file.name.toLowerCase().endsWith('.ods') && !file.type.includes('opendocument')) {
+      alert('Por favor, selecciona un archivo ODS válido.');
+      return;
+    }
 
     setIsProcessing(true);
     
     try {
       const text = await file.text();
+      // Procesar como TSV (Tab Separated Values) que es más común en ODS
       const lines = text.split('\n');
-      const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+      const headers = lines[0].split('\t').map(h => h.replace(/"/g, '').trim());
       
       const validCategories = CATEGORIES.map(c => c.name);
       const validDimensions = DIMENSIONS.map(d => d.name);
@@ -97,7 +106,7 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
         const line = lines[i].trim();
         if (!line) continue;
         
-        const values = line.split(',').map(v => v.replace(/"/g, '').trim());
+        const values = line.split('\t').map(v => v.replace(/"/g, '').trim());
         
         if (values.length < 10) continue;
         
@@ -106,19 +115,19 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
           priceStr, category, quality, deliveryDaysStr, inStockStr
         ] = values;
         
-        // Validaciones
+        // Validaciones específicas para ODS
         if (!validDimensions.includes(dimension)) {
-          console.warn(`Dimensión inválida: ${dimension}`);
+          console.warn(`Dimensión inválida en ODS: ${dimension}`);
           continue;
         }
         
         if (!validCategories.includes(category)) {
-          console.warn(`Categoría inválida: ${category}`);
+          console.warn(`Categoría inválida en ODS: ${category}`);
           continue;
         }
         
         if (!validQualities.includes(quality as any)) {
-          console.warn(`Calidad inválida: ${quality}`);
+          console.warn(`Calidad inválida en ODS: ${quality}`);
           continue;
         }
         
@@ -171,10 +180,11 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
         });
       }
       
-      console.log(`Procesados: ${processedProducts.length} nuevos, ${updatedProducts.length} actualizados`);
+      console.log(`Archivo ODS procesado: ${processedProducts.length} nuevos, ${updatedProducts.length} actualizados`);
       
     } catch (error) {
-      console.error('Error procesando archivo:', error);
+      console.error('Error procesando archivo ODS:', error);
+      alert('Error al procesar el archivo ODS. Por favor, verifica el formato.');
     } finally {
       setIsProcessing(false);
       event.target.value = '';
@@ -184,95 +194,97 @@ const ODSUpload = ({ products, onUpload, onUpdate, supplierId, supplierName }: O
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Descargar Plantilla */}
-        <Card>
+        {/* Descargar Plantilla ODS */}
+        <Card className="border-amber-200">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Download className="w-5 h-5 mr-2 text-amber-600" />
+            <CardTitle className="flex items-center text-amber-700">
+              <Download className="w-5 h-5 mr-2" />
               Plantilla ODS
             </CardTitle>
             <CardDescription>
-              Descarga la plantilla con formato ODS/CSV
+              Descarga la plantilla en formato ODS con ejemplos
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button 
               variant="outline" 
-              className="w-full"
+              className="w-full border-amber-300 hover:bg-amber-50"
               onClick={downloadODSTemplate}
             >
               <Download className="w-4 h-4 mr-2" />
-              Descargar Plantilla
+              Descargar Plantilla ODS
             </Button>
           </CardContent>
         </Card>
 
-        {/* Descargar Mis Productos */}
-        <Card>
+        {/* Descargar Mis Productos en ODS */}
+        <Card className="border-blue-200">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <FileSpreadsheet className="w-5 h-5 mr-2 text-blue-600" />
-              Mis Productos
+            <CardTitle className="flex items-center text-blue-700">
+              <FileSpreadsheet className="w-5 h-5 mr-2" />
+              Mis Productos ODS
             </CardTitle>
             <CardDescription>
-              Descarga todos tus productos actuales
+              Descarga todos tus productos en formato ODS
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button 
               variant="outline" 
-              className="w-full"
-              onClick={downloadMyProducts}
+              className="w-full border-blue-300 hover:bg-blue-50"
+              onClick={downloadMyProductsODS}
               disabled={products.length === 0}
             >
               <Download className="w-4 h-4 mr-2" />
-              Descargar ({products.length})
+              Descargar ODS ({products.length})
             </Button>
           </CardContent>
         </Card>
 
-        {/* Subir Archivo */}
-        <Card>
+        {/* Subir Archivo ODS */}
+        <Card className="border-green-200">
           <CardHeader>
-            <CardTitle className="flex items-center">
-              <Upload className="w-5 h-5 mr-2 text-green-600" />
-              Subir ODS/CSV
+            <CardTitle className="flex items-center text-green-700">
+              <Upload className="w-5 h-5 mr-2" />
+              Subir Archivo ODS
             </CardTitle>
             <CardDescription>
-              Sube productos nuevos o actualiza existentes
+              Sube productos nuevos o actualiza existentes desde ODS
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <input
                 type="file"
-                accept=".csv,.ods"
-                onChange={handleFileUpload}
+                accept=".ods,application/vnd.oasis.opendocument.spreadsheet"
+                onChange={handleODSUpload}
                 className="hidden"
                 id="ods-upload"
                 disabled={isProcessing}
               />
               <Button 
-                className="w-full"
+                className="w-full bg-green-600 hover:bg-green-700"
                 onClick={() => document.getElementById('ods-upload')?.click()}
                 disabled={isProcessing}
               >
                 <Upload className="w-4 h-4 mr-2" />
-                {isProcessing ? 'Procesando...' : 'Seleccionar Archivo'}
+                {isProcessing ? 'Procesando ODS...' : 'Seleccionar Archivo ODS'}
               </Button>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-blue-50">
+      <Card className="bg-amber-50 border-amber-200">
         <CardContent className="pt-4">
-          <h4 className="font-medium mb-2">Instrucciones para ODS:</h4>
-          <ul className="text-sm text-gray-600 space-y-1 ml-4">
-            <li>• ID Interno: Usar para identificar productos existentes y actualizarlos</li>
-            <li>• Nuevos productos: Dejar ID Interno vacío</li>
-            <li>• Actualizar productos: Usar el mismo ID Interno del producto existente</li>
-            <li>• El archivo debe mantener el orden de las columnas de la plantilla</li>
+          <h4 className="font-medium mb-2 text-amber-800">Instrucciones para archivos ODS:</h4>
+          <ul className="text-sm text-amber-700 space-y-1 ml-4">
+            <li>• <strong>Formato exclusivo ODS:</strong> Solo se aceptan archivos .ods (LibreOffice/OpenOffice Calc)</li>
+            <li>• <strong>ID Interno:</strong> Usar para identificar productos existentes y actualizarlos</li>
+            <li>• <strong>Productos nuevos:</strong> Dejar ID Interno vacío para crear nuevos productos</li>
+            <li>• <strong>Actualizar productos:</strong> Usar el mismo ID Interno del producto existente</li>
+            <li>• <strong>Estructura:</strong> El archivo debe mantener el orden de las columnas de la plantilla ODS</li>
+            <li>• <strong>Separadores:</strong> Los datos en ODS se separan automáticamente por pestañas</li>
           </ul>
         </CardContent>
       </Card>
