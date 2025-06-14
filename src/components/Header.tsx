@@ -52,11 +52,6 @@ const Header = () => {
         </div>
 
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-            <Settings className="w-4 h-4 mr-2" />
-            Configuración
-          </Button>
-          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">

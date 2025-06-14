@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,13 +36,11 @@ const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProdu
   };
 
   const totalProducts = products.length;
-  const avgPrice = products.length > 0 ? products.reduce((sum, p) => sum + p.price, 0) / products.length : 0;
-  const categoriesCount = new Set(products.map(p => p.category)).size;
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
       {/* Dashboard Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         <Card className="border-l-4 border-l-amber-500">
           <CardHeader className="pb-3">
             <CardTitle className="text-2xl font-bold text-gray-900">{totalProducts}</CardTitle>
@@ -53,32 +50,6 @@ const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProdu
             <div className="flex items-center text-sm text-gray-500">
               <Package className="w-4 h-4 mr-1" />
               En catálogo
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-green-500">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-2xl font-bold text-gray-900">${avgPrice.toFixed(2)}</CardTitle>
-            <CardDescription className="text-gray-600">Precio Promedio</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center text-sm text-gray-500">
-              <BarChart3 className="w-4 h-4 mr-1" />
-              Por unidad
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-2xl font-bold text-gray-900">{categoriesCount}</CardTitle>
-            <CardDescription className="text-gray-600">Categorías</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center text-sm text-gray-500">
-              <Package className="w-4 h-4 mr-1" />
-              Disponibles
             </div>
           </CardContent>
         </Card>
