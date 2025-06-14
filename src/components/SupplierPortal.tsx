@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { PlusCircle, Upload, Download, Package, BarChart3 } from "lucide-react";
+import { PlusCircle, Upload, Download, BarChart3 } from "lucide-react";
 import ProductForm from './ProductForm';
 import ProductTable from './ProductTable';
 import CSVUpload from './CSVUpload';
@@ -35,26 +35,8 @@ const SupplierPortal = ({ products, onAddProduct, onUpdateProduct, onDeleteProdu
     setEditingProduct(null);
   };
 
-  const totalProducts = products.length;
-
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
-      {/* Dashboard Stats */}
-      <div className="grid grid-cols-1 gap-6">
-        <Card className="border-l-4 border-l-amber-500">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-2xl font-bold text-gray-900">{totalProducts}</CardTitle>
-            <CardDescription className="text-gray-600">Productos Activos</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center text-sm text-gray-500">
-              <Package className="w-4 h-4 mr-1" />
-              En catálogo
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Management Tabs */}
       <Tabs defaultValue="products" className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-gray-100">
