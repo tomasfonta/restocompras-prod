@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Package, Truck, Star, BarChart3 } from "lucide-react";
+import { Search, Package, Truck, Star } from "lucide-react";
 import { Product } from '../types/Product';
 import { useUser } from '../contexts/UserContext';
 import MenuManagement from './MenuManagement';
@@ -61,16 +60,6 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
         </TabsList>
 
         <TabsContent value="catalog" className="space-y-6">
-          {/* Cost Analysis Button - switches to analysis tab */}
-          <div className="flex justify-end">
-            <Button 
-              onClick={handleAnalysisTab}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Análisis de Costos
-            </Button>
-          </div>
           {/* Search and Filters Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
@@ -114,16 +103,6 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
         </TabsContent>
 
         <TabsContent value="menu" className="space-y-6">
-          {/* Cost Analysis Button - switches to analysis tab */}
-          <div className="flex justify-end">
-            <Button 
-              onClick={handleAnalysisTab}
-              className="bg-blue-600 hover:bg-blue-700"
-            >
-              <BarChart3 className="w-4 h-4 mr-2" />
-              Análisis de Costos
-            </Button>
-          </div>
           <MenuManagement />
         </TabsContent>
 
