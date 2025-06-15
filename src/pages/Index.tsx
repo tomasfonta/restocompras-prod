@@ -55,7 +55,7 @@ const Index = () => {
     : products;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
       <Header />
       
       {/* Cost Analysis Button for Restaurants */}
@@ -64,7 +64,7 @@ const Index = () => {
           <div className="flex justify-end">
             <Button 
               onClick={() => navigate('/cost-analysis')}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-200"
             >
               <BarChart3 className="w-4 h-4 mr-2" />
               Análisis de Costos
@@ -73,7 +73,7 @@ const Index = () => {
         </div>
       )}
       
-      <main>
+      <main className="backdrop-blur-sm">
         {currentUser.userType === 'supplier' ? (
           <SupplierPortal 
             products={userProducts}
