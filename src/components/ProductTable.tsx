@@ -1,8 +1,8 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Edit, Trash2, Eye, Star, Clock, Package, ShoppingCart } from "lucide-react";
 import { Product } from '../types/Product';
 import { useShoppingCart } from '../contexts/ShoppingCartContext';
@@ -19,7 +19,6 @@ interface ProductTableProps {
 const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierClick }: ProductTableProps) => {
   const [sortField, setSortField] = useState<keyof Product>('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
-  const [quantities, setQuantities] = useState<Record<string, { quantity: number; monthlyAmount: number }>>({});
   const { addToCart } = useShoppingCart();
   const { t } = useTranslation();
 
@@ -33,18 +32,8 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
   };
 
   const handleAddToCart = (product: Product) => {
-    const productQuantities = quantities[product.id] || { quantity: 1, monthlyAmount: 1 };
-    addToCart(product, productQuantities.quantity, productQuantities.monthlyAmount);
-  };
-
-  const updateQuantity = (productId: string, field: 'quantity' | 'monthlyAmount', value: number) => {
-    setQuantities(prev => ({
-      ...prev,
-      [productId]: {
-        ...prev[productId] || { quantity: 1, monthlyAmount: 1 },
-        [field]: value
-      }
-    }));
+    // Add with default quantities when adding from catalog
+    addToCart(product, 1, 1);
   };
 
   const sortedProducts = [...products].sort((a, b) => {
@@ -139,26 +128,6 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
                   <div>
                     <div className="font-bold text-lg text-gray-900 dark:text-gray-100">{product.name}</div>
                     <div className="text-sm text-gray-600 dark:text-gray-400">{product.brand}</div>
-                    {!isSupplierView && (
-                      <div className="flex items-center space-x-2 mt-2">
-                        <Input
-                          type="number"
-                          placeholder="Cant."
-                          value={quantities[product.id]?.quantity || 1}
-                          onChange={(e) => updateQuantity(product.id, 'quantity', parseInt(e.target.value) || 1)}
-                          className="w-16 h-8 text-xs"
-                          min="1"
-                        />
-                        <Input
-                          type="number"
-                          placeholder="Mensual"
-                          value={quantities[product.id]?.monthlyAmount || 1}
-                          onChange={(e) => updateQuantity(product.id, 'monthlyAmount', parseInt(e.target.value) || 1)}
-                          className="w-20 h-8 text-xs"
-                          min="1"
-                        />
-                      </div>
-                    )}
                   </div>
                 </td>
                 <td className="p-4">
