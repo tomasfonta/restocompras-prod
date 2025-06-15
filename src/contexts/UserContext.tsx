@@ -4,7 +4,7 @@ import { User } from '../types/User';
 
 interface UserContextType {
   currentUser: User | null;
-  login: (email: string, password: string) => boolean;
+  login: (email: string) => boolean;
   logout: () => void;
   updateUser: (userData: Partial<User>) => void;
   users: User[];
@@ -51,8 +51,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  const login = (email: string, password: string): boolean => {
-    const user = users.find(u => u.email === email && u.password === password);
+  const login = (email: string): boolean => {
+    const user = users.find(u => u.email === email);
     if (user) {
       setCurrentUser(user);
       localStorage.setItem('currentUser', JSON.stringify(user));
