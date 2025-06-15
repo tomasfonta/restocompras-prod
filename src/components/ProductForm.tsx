@@ -1,13 +1,15 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Upload, X, Image } from "lucide-react";
 import { Product } from '../types/Product';
 import { CATEGORIES } from '../types/Category';
 import { DIMENSIONS } from '../types/Dimension';
+import { getProductImage } from '../utils/productImages';
 
 interface ProductFormProps {
   initialData?: Product | null;
@@ -16,6 +18,7 @@ interface ProductFormProps {
 }
 
 const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [formData, setFormData] = useState({
     name: '',
     size: 0,
@@ -28,8 +31,10 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
     supplierId: 'user-2',
     supplierName: 'Lácteos del Valle',
     inStock: true,
-    lastUpdated: new Date().toISOString()
+    lastUpdated: new Date().toISOString(),
+    image: ''
   });
+  const [imagePreview, setImagePreview] = useState<string>('');
 
   useEffect(() => {
     if (initialData) {
@@ -46,8 +51,10 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
         supplierId: initialData.supplierId,
         supplierName: initialData.supplierName,
         inStock: initialData.inStock,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        image: (initialData as any).image || ''
       });
+      setImagePreview((initialData as any).image || getProductImage(initialData));
     } else {
       // Reset form for new product
       setFormData({
@@ -62,10 +69,45 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
         supplierId: 'user-2',
         supplierName: 'Lácteos del Valle',
         inStock: true,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        image: ''
       });
+      setImagePreview('');
     }
   }, [initialData]);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Por favor selecciona un archivo de imagen válido');
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('El archivo es muy grande. Máximo 5MB permitido');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setImagePreview(imageUrl);
+        setFormData({ ...formData, image: imageUrl });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImagePreview('');
+    setFormData({ ...formData, image: '' });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,6 +193,62 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
               </SelectContent>
             </Select>
           </div>
+
+          {/* Image Upload Section */}
+          <div>
+            <Label>Imagen del Producto</Label>
+            <Card className="border-2 border-dashed border-gray-300 dark:border-gray-600">
+              <CardContent className="p-4">
+                {imagePreview ? (
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <img
+                        src={imagePreview}
+                        alt="Vista previa"
+                        className="w-full h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+                      />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        className="absolute top-2 right-2"
+                        onClick={handleRemoveImage}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Cambiar Imagen
+                    </Button>
+                  </div>
+                ) : (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full h-32 flex flex-col items-center justify-center space-y-2 text-gray-500 dark:text-gray-400"
+                  >
+                    <Image className="w-8 h-8" />
+                    <span>Subir Imagen</span>
+                    <span className="text-xs">PNG, JPG hasta 5MB</span>
+                  </Button>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         <div className="space-y-4">
@@ -198,7 +296,7 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
         </div>
       </div>
 
-      <Card className="bg-gray-50">
+      <Card className="bg-gray-50 dark:bg-gray-800">
         <CardContent className="pt-4">
           <div className="flex items-center space-x-2">
             <input
