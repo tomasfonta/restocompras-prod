@@ -16,6 +16,66 @@ interface ProductTableProps {
   onSupplierClick?: (supplierId: string) => void;
 }
 
+// Default images based on product names
+const getDefaultImage = (productName: string): string => {
+  const name = productName.toLowerCase();
+  
+  if (name.includes('leche') || name.includes('milk')) {
+    return 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('queso') || name.includes('cheese')) {
+    return 'https://images.unsplash.com/photo-1452195100486-9cc805987862?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('yogurt') || name.includes('yogur')) {
+    return 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('huevo') || name.includes('egg')) {
+    return 'https://images.unsplash.com/photo-1518569656558-1f25e69d93d7?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('pan') || name.includes('bread')) {
+    return 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('tomate') || name.includes('tomato')) {
+    return 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('cebolla') || name.includes('onion')) {
+    return 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('papa') || name.includes('potato')) {
+    return 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('carne') || name.includes('meat') || name.includes('beef')) {
+    return 'https://images.unsplash.com/photo-1588347818863-0d38ac970ad7?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('pollo') || name.includes('chicken')) {
+    return 'https://images.unsplash.com/photo-1587593810167-a84920ea0781?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('pescado') || name.includes('fish')) {
+    return 'https://images.unsplash.com/photo-1544943748-6d7570595c6d?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('arroz') || name.includes('rice')) {
+    return 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('pasta') || name.includes('noodle')) {
+    return 'https://images.unsplash.com/photo-1551892374-ecf8754cf8b0?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('aceite') || name.includes('oil')) {
+    return 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('sal') || name.includes('salt')) {
+    return 'https://images.unsplash.com/photo-1472162314594-b9db545e4e90?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('azucar') || name.includes('sugar')) {
+    return 'https://images.unsplash.com/photo-1559395285-65c3b4b8f1e3?w=80&h=80&fit=crop&crop=center';
+  }
+  if (name.includes('harina') || name.includes('flour')) {
+    return 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=80&h=80&fit=crop&crop=center';
+  }
+  
+  // Default food image
+  return 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=80&h=80&fit=crop&crop=center';
+};
+
 const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierClick }: ProductTableProps) => {
   const [sortField, setSortField] = useState<keyof Product>('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -32,8 +92,8 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
   };
 
   const handleAddToCart = (product: Product) => {
-    // Add with default quantities when adding from catalog
-    addToCart(product, 1, 1);
+    // Add with default quantity when adding from catalog
+    addToCart(product, 1);
   };
 
   const sortedProducts = [...products].sort((a, b) => {
@@ -125,9 +185,19 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
             {sortedProducts.map((product) => (
               <tr key={product.id} className="border-t border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
                 <td className="p-4">
-                  <div>
-                    <div className="font-bold text-lg text-gray-900 dark:text-gray-100">{product.name}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">{product.brand}</div>
+                  <div className="flex items-center space-x-3">
+                    <img
+                      src={product.imageUrl || getDefaultImage(product.name)}
+                      alt={product.name}
+                      className="w-12 h-12 rounded-lg object-cover border border-gray-200"
+                      onError={(e) => {
+                        e.currentTarget.src = getDefaultImage(product.name);
+                      }}
+                    />
+                    <div>
+                      <div className="font-bold text-lg text-gray-900 dark:text-gray-100">{product.name}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">{product.brand}</div>
+                    </div>
                   </div>
                 </td>
                 <td className="p-4">
@@ -219,17 +289,29 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
         {sortedProducts.map((product) => (
           <Card key={product.id} className="p-4">
             <div className="space-y-3">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{product.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{product.brand}</p>
-                  <span className="text-sm font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md inline-block mt-1">
-                    {product.size} {product.dimension}
-                  </span>
+              <div className="flex items-start space-x-3">
+                <img
+                  src={product.imageUrl || getDefaultImage(product.name)}
+                  alt={product.name}
+                  className="w-16 h-16 rounded-lg object-cover border border-gray-200"
+                  onError={(e) => {
+                    e.currentTarget.src = getDefaultImage(product.name);
+                  }}
+                />
+                <div className="flex-1">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{product.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">{product.brand}</p>
+                      <span className="text-sm font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md inline-block mt-1">
+                        {product.size} {product.dimension}
+                      </span>
+                    </div>
+                    <span className={`font-bold px-2 py-1 rounded-md text-sm ${getPriceColor(product.price)}`}>
+                      ${product.price.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
-                <span className={`font-bold px-2 py-1 rounded-md text-sm ${getPriceColor(product.price)}`}>
-                  ${product.price.toFixed(2)}
-                </span>
               </div>
               
               <div className="flex flex-wrap gap-2">
