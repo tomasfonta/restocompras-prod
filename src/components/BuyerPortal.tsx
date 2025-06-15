@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -64,7 +65,7 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
           <div className="flex justify-end">
             <Button 
               onClick={() => navigate('/cost-analysis')}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-blue-600 hover:bg-blue-700"
             >
               <BarChart3 className="w-4 h-4 mr-2" />
               Análisis de Costos
@@ -116,7 +117,6 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-gray-600 text-sm">{product.description}</p>
                   <div className="flex justify-between items-center">
                     <div>
                       <span className="text-gray-700 font-medium">Marca:</span> {product.brand}
@@ -131,9 +131,8 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
                       <Truck className="w-4 h-4 text-gray-500" />
                       <span>{product.deliveryDays} días</span>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Star className="w-4 h-4 text-yellow-500" />
-                      <span>{product.rating}</span>
+                    <div className="text-lg font-semibold text-blue-600">
+                      ${product.price.toFixed(2)}
                     </div>
                   </div>
                   <footer>
@@ -152,7 +151,7 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
           <div className="flex justify-end">
             <Button 
               onClick={() => navigate('/cost-analysis')}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-blue-600 hover:bg-blue-700"
             >
               <BarChart3 className="w-4 h-4 mr-2" />
               Análisis de Costos

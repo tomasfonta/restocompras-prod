@@ -66,18 +66,18 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom RestoCompras colors
-				amber: {
-					50: '#fffbeb',
-					100: '#fef3c7',
-					200: '#fde68a',
-					300: '#fcd34d',
-					400: '#fbbf24',
-					500: '#f59e0b',
-					600: '#d97706',
-					700: '#b45309',
-					800: '#92400e',
-					900: '#78350f',
+				// Modern blue color palette
+				blue: {
+					50: '#f0f4ff',
+					100: '#e0ecff',
+					200: '#c7dcff',
+					300: '#a4c7ff',
+					400: '#81a9ff',
+					500: '#5b87ff',
+					600: '#4366f5',
+					700: '#3751e0',
+					800: '#2d41b4',
+					900: '#2a3a8f',
 				}
 			},
 			borderRadius: {
@@ -111,12 +111,21 @@ export default {
 						opacity: '1',
 						transform: 'translateY(0)'
 					}
+				},
+				'float': {
+					'0%, 100%': {
+						transform: 'translateY(0px)'
+					},
+					'50%': {
+						transform: 'translateY(-10px)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'fade-in': 'fade-in 0.3s ease-out'
+				'fade-in': 'fade-in 0.3s ease-out',
+				'float': 'float 6s ease-in-out infinite'
 			}
 		}
 	},
