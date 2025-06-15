@@ -1,11 +1,11 @@
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Upload, X, Image } from "lucide-react";
+import { Upload, X } from "lucide-react";
 import { Product } from '../types/Product';
 import { CATEGORIES } from '../types/Category';
 import { DIMENSIONS } from '../types/Dimension';
@@ -34,7 +34,6 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
   });
 
   const [imagePreview, setImagePreview] = useState<string>('');
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (initialData) {
@@ -80,10 +79,10 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (event) => {
-        const imageUrl = event.target?.result as string;
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
         setImagePreview(imageUrl);
-        setFormData({ ...formData, imageUrl });
+        setFormData({...formData, imageUrl});
       };
       reader.readAsDataURL(file);
     }
@@ -91,10 +90,7 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
 
   const removeImage = () => {
     setImagePreview('');
-    setFormData({ ...formData, imageUrl: '' });
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
+    setFormData({...formData, imageUrl: ''});
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -229,51 +225,41 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
           {/* Image Upload Section */}
           <div>
             <Label htmlFor="image">Imagen del Producto</Label>
-            <div className="space-y-4">
+            <div className="mt-2">
               {imagePreview ? (
-                <div className="relative">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-48 object-cover rounded-lg border"
+                <div className="relative inline-block">
+                  <img 
+                    src={imagePreview} 
+                    alt="Vista previa" 
+                    className="w-32 h-32 object-cover rounded-lg border"
                   />
                   <Button
                     type="button"
                     variant="destructive"
                     size="sm"
-                    className="absolute top-2 right-2"
+                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0"
                     onClick={removeImage}
                   >
                     <X className="w-4 h-4" />
                   </Button>
                 </div>
               ) : (
-                <div
-                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Image className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-                  <p className="text-gray-600 mb-2">Haz clic para subir una imagen</p>
-                  <p className="text-sm text-gray-500">PNG, JPG hasta 5MB</p>
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600 mb-2">Haz clic para subir una imagen</p>
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <Label htmlFor="image" className="cursor-pointer">
+                    <Button type="button" variant="outline" size="sm">
+                      Seleccionar Imagen
+                    </Button>
+                  </Label>
                 </div>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              {!imagePreview && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full"
-                >
-                  <Upload className="w-4 h-4 mr-2" />
-                  Subir Imagen
-                </Button>
               )}
             </div>
           </div>
