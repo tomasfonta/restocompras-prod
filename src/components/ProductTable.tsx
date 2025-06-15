@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -7,6 +6,7 @@ import { Edit, Trash2, Eye, Star, Clock, Package, ShoppingCart } from "lucide-re
 import { Product } from '../types/Product';
 import { useShoppingCart } from '../contexts/ShoppingCartContext';
 import { useTranslation } from '../contexts/LanguageContext';
+import { getProductImage } from '../utils/productImages';
 
 interface ProductTableProps {
   products: Product[];
@@ -32,8 +32,7 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
   };
 
   const handleAddToCart = (product: Product) => {
-    // Add with default quantities when adding from catalog
-    addToCart(product, 1, 1);
+    addToCart(product, 1);
   };
 
   const sortedProducts = [...products].sort((a, b) => {
@@ -125,9 +124,19 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
             {sortedProducts.map((product) => (
               <tr key={product.id} className="border-t border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
                 <td className="p-4">
-                  <div>
-                    <div className="font-bold text-lg text-gray-900 dark:text-gray-100">{product.name}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">{product.brand}</div>
+                  <div className="flex items-center space-x-3">
+                    <img 
+                      src={getProductImage(product)} 
+                      alt={product.name}
+                      className="w-12 h-12 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=400&fit=crop';
+                      }}
+                    />
+                    <div>
+                      <div className="font-bold text-lg text-gray-900 dark:text-gray-100">{product.name}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">{product.brand}</div>
+                    </div>
                   </div>
                 </td>
                 <td className="p-4">
@@ -220,12 +229,22 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
           <Card key={product.id} className="p-4">
             <div className="space-y-3">
               <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{product.name}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">{product.brand}</p>
-                  <span className="text-sm font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md inline-block mt-1">
-                    {product.size} {product.dimension}
-                  </span>
+                <div className="flex items-center space-x-3">
+                  <img 
+                    src={getProductImage(product)} 
+                    alt={product.name}
+                    className="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-gray-700"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=400&fit=crop';
+                    }}
+                  />
+                  <div>
+                    <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{product.name}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{product.brand}</p>
+                    <span className="text-sm font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md inline-block mt-1">
+                      {product.size} {product.dimension}
+                    </span>
+                  </div>
                 </div>
                 <span className={`font-bold px-2 py-1 rounded-md text-sm ${getPriceColor(product.price)}`}>
                   ${product.price.toFixed(2)}

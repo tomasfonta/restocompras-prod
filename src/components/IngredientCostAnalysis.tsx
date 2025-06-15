@@ -72,7 +72,7 @@ const IngredientCostAnalysis: React.FC = () => {
             unit: ingredient.unit,
             dishes: [{
               name: dish.name,
-              monthlyServings: dish.monthlyServings || 1 // por defecto 1
+              monthlyServings: dish.monthlyServings || 1
             }],
             totalMonthlyServings: dish.monthlyServings || 1
           });
