@@ -80,6 +80,75 @@ const generateCurrentSupplierProducts = (): Product[] => {
     lastUpdated: new Date().toISOString(),
   });
 
+  // Alternativas más baratas para cada ingrediente usado en los platos demo
+  // Bacon (bacon premium ya está, agregaremos un bacon aún más barato)
+  products.push({
+    id: `current-bacon-cheap`,
+    name: 'Bacon Ahorro',
+    size: 100,
+    dimension: 'g',
+    brand: 'Chanchito Feliz',
+    price: 2.8, // Más barato que 5.00 de ingrediente y 4.00 del premium
+    category: 'Fiambres',
+    quality: 'Media',
+    deliveryDays: 2,
+    supplierId: 'supplier-9',
+    supplierName: 'Comercializadora Norte',
+    inStock: true,
+    lastUpdated: new Date().toISOString(),
+  });
+
+  // Pasta
+  products.push({
+    id: `current-pasta-cheap`,
+    name: 'Pasta Spaghetti Económica',
+    size: 200,
+    dimension: 'g',
+    brand: 'Doña Pasta',
+    price: 1.80,
+    category: 'Pastas',
+    quality: 'Básica',
+    deliveryDays: 1,
+    supplierId: 'supplier-6',
+    supplierName: 'Mercado Mayorista',
+    inStock: true,
+    lastUpdated: new Date().toISOString(),
+  });
+
+  // Huevo
+  products.push({
+    id: `current-huevos-cheap`,
+    name: 'Huevos Granja Pack',
+    size: 12,
+    dimension: 'unidad',
+    brand: 'GranjaEco',
+    price: 3.80,
+    category: 'Huevos',
+    quality: 'Media',
+    deliveryDays: 1,
+    supplierId: 'supplier-3',
+    supplierName: 'Verduras Frescas SA',
+    inStock: true,
+    lastUpdated: new Date().toISOString(),
+  });
+
+  // Parmesano
+  products.push({
+    id: `current-parmesano-cheap`,
+    name: 'Queso Parmesano Rallado',
+    size: 100,
+    dimension: 'g',
+    brand: 'Quesería Italia',
+    price: 5.00,
+    category: 'Lácteos',
+    quality: 'Alta',
+    deliveryDays: 2,
+    supplierId: 'supplier-2',
+    supplierName: 'Panadería Artesanal',
+    inStock: true,
+    lastUpdated: new Date().toISOString(),
+  });
+
   return products;
 };
 
@@ -172,10 +241,11 @@ const generateSampleDishes = (): Dish[] => [
     userId: 'user-1',
     createdAt: '2024-06-01T10:00:00Z',
     updatedAt: '2024-06-01T10:00:00Z',
+    monthlyServings: 140, // Cambiado a 140
     ingredients: [
       { id: 'ing-1', name: 'Pasta', quantity: 200, unit: 'g', cost: 2.50 },
       { id: 'ing-2', name: 'Bacon', quantity: 100, unit: 'g', cost: 5.00 },
-      { id: 'ing-3', name: 'Huevos', quantity: 2, unit: 'unidades', cost: 1.00 },
+      { id: 'ing-3', name: 'Huevos', quantity: 2, unit: 'unidad', cost: 1.00 },
       { id: 'ing-4', name: 'Queso Parmesano', quantity: 50, unit: 'g', cost: 3.00 }
     ]
   }
