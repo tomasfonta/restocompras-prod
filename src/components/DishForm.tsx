@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +9,8 @@ import { Plus, Trash2 } from "lucide-react";
 import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/components/ui/table";
 import { Dish, Ingredient } from '../types/Dish';
 import { useUser } from '../contexts/UserContext';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { DIMENSIONS } from "../types/Dimension";
 
 interface DishFormProps {
   dish?: Dish;
@@ -34,7 +35,7 @@ const DishForm: React.FC<DishFormProps> = ({ dish, onSave, onCancel }) => {
   });
 
   const addIngredient = () => {
-    if (newIngredient.name && newIngredient.quantity > 0) {
+    if (newIngredient.name && newIngredient.quantity > 0 && newIngredient.unit) {
       const ingredient: Ingredient = {
         ...newIngredient,
         id: Date.now().toString()
@@ -164,7 +165,7 @@ const DishForm: React.FC<DishFormProps> = ({ dish, onSave, onCancel }) => {
                     <TableRow>
                       <TableHead>Nombre</TableHead>
                       <TableHead>Cantidad</TableHead>
-                      <TableHead>Unidad</TableHead>
+                      <TableHead>Dimensión</TableHead>
                       <TableHead>Costo</TableHead>
                       <TableHead></TableHead>
                     </TableRow>
@@ -187,11 +188,21 @@ const DishForm: React.FC<DishFormProps> = ({ dish, onSave, onCancel }) => {
                         />
                       </TableCell>
                       <TableCell>
-                        <Input
-                          placeholder="Unidad"
+                        <Select
                           value={newIngredient.unit}
-                          onChange={(e) => setNewIngredient({ ...newIngredient, unit: e.target.value })}
-                        />
+                          onValueChange={(value) => setNewIngredient({ ...newIngredient, unit: value })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Dimensión" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {DIMENSIONS.map((dim) => (
+                              <SelectItem key={dim.id} value={dim.name}>
+                                {dim.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </TableCell>
                       <TableCell>
                         <Input
@@ -222,7 +233,7 @@ const DishForm: React.FC<DishFormProps> = ({ dish, onSave, onCancel }) => {
                     <TableRow>
                       <TableHead>Nombre</TableHead>
                       <TableHead>Cantidad</TableHead>
-                      <TableHead>Unidad</TableHead>
+                      <TableHead>Dimensión</TableHead>
                       <TableHead>Costo</TableHead>
                       <TableHead>Acciones</TableHead>
                     </TableRow>
@@ -244,10 +255,21 @@ const DishForm: React.FC<DishFormProps> = ({ dish, onSave, onCancel }) => {
                           />
                         </TableCell>
                         <TableCell>
-                          <Input
+                          <Select
                             value={ingredient.unit}
-                            onChange={(e) => updateIngredient(ingredient.id, 'unit', e.target.value)}
-                          />
+                            onValueChange={(value) => updateIngredient(ingredient.id, 'unit', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Dimensión" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {DIMENSIONS.map((dim) => (
+                                <SelectItem key={dim.id} value={dim.name}>
+                                  {dim.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
                         </TableCell>
                         <TableCell>
                           <Input
@@ -290,4 +312,3 @@ const DishForm: React.FC<DishFormProps> = ({ dish, onSave, onCancel }) => {
 };
 
 export default DishForm;
-
