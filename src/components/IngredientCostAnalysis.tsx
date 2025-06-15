@@ -27,7 +27,7 @@ interface AnalysisIngredient {
   selectedSupplierId: string;
 }
 
-const IngredientCostAnalysis = ({ products, dishes }: IngredientCostAnalysisProps) => {
+const IngredientCostAnalysis = ({ products = [], dishes = [] }: IngredientCostAnalysisProps) => {
   const { t } = useTranslation();
   const { addToCart } = useShoppingCart();
   const [selectedDish, setSelectedDish] = useState<string>('');
@@ -36,6 +36,10 @@ const IngredientCostAnalysis = ({ products, dishes }: IngredientCostAnalysisProp
 
   // Get unique products by name (combining from different suppliers)
   const getUniqueProducts = () => {
+    if (!products || !Array.isArray(products)) {
+      return [];
+    }
+    
     const uniqueProducts = new Map<string, Product[]>();
     
     products.forEach(product => {

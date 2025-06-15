@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -12,6 +11,7 @@ import { Product } from '../types/Product';
 import { useUser } from '../contexts/UserContext';
 import { useTranslation } from '../contexts/LanguageContext';
 import { useShoppingCart } from '../contexts/ShoppingCartContext';
+import { useData } from '../contexts/DataContext';
 import MenuManagement from './MenuManagement';
 import ProductTable from './ProductTable';
 import IngredientCostAnalysis from './IngredientCostAnalysis';
@@ -26,11 +26,15 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
   const [activeTab, setActiveTab] = useState('catalog');
   const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
   const { currentUser } = useUser();
+  const { getDishesByUser } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedQuality, setSelectedQuality] = useState('all');
   const { t } = useTranslation();
   const { cartItems } = useShoppingCart();
+
+  // Get user's dishes
+  const userDishes = currentUser ? getDishesByUser(currentUser.id) : [];
 
   // Get unique categories and qualities for filters
   const categories = Array.from(new Set(products.map(p => p.category)));
@@ -146,7 +150,7 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
         </TabsContent>
 
         <TabsContent value="analysis" className="space-y-6">
-          <IngredientCostAnalysis />
+          <IngredientCostAnalysis products={products} dishes={userDishes} />
         </TabsContent>
 
         <TabsContent value="cart" className="space-y-6">
