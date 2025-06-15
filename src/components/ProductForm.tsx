@@ -1,10 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Upload, X, Image } from "lucide-react";
 import { Product } from '../types/Product';
 import { CATEGORIES } from '../types/Category';
 import { DIMENSIONS } from '../types/Dimension';
@@ -28,8 +29,12 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
     supplierId: 'user-2',
     supplierName: 'Lácteos del Valle',
     inStock: true,
-    lastUpdated: new Date().toISOString()
+    lastUpdated: new Date().toISOString(),
+    imageUrl: ''
   });
+
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (initialData) {
@@ -46,8 +51,10 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
         supplierId: initialData.supplierId,
         supplierName: initialData.supplierName,
         inStock: initialData.inStock,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        imageUrl: initialData.imageUrl || ''
       });
+      setImagePreview(initialData.imageUrl || '');
     } else {
       // Reset form for new product
       setFormData({
@@ -62,10 +69,33 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
         supplierId: 'user-2',
         supplierName: 'Lácteos del Valle',
         inStock: true,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        imageUrl: ''
       });
+      setImagePreview('');
     }
   }, [initialData]);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageUrl = event.target?.result as string;
+        setImagePreview(imageUrl);
+        setFormData({ ...formData, imageUrl });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview('');
+    setFormData({ ...formData, imageUrl: '' });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,6 +224,58 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
               onChange={(e) => setFormData({...formData, deliveryDays: parseInt(e.target.value) || 1})}
               required
             />
+          </div>
+
+          {/* Image Upload Section */}
+          <div>
+            <Label htmlFor="image">Imagen del Producto</Label>
+            <div className="space-y-4">
+              {imagePreview ? (
+                <div className="relative">
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="w-full h-48 object-cover rounded-lg border"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-2 right-2"
+                    onClick={removeImage}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div
+                  className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Image className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                  <p className="text-gray-600 mb-2">Haz clic para subir una imagen</p>
+                  <p className="text-sm text-gray-500">PNG, JPG hasta 5MB</p>
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              {!imagePreview && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full"
+                >
+                  <Upload className="w-4 h-4 mr-2" />
+                  Subir Imagen
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

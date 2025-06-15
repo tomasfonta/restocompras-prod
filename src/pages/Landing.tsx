@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, BarChart3, Users, Package, TrendingUp, Star, CheckCircle } from "lucide-react";
+import { ArrowRight, BarChart3, Users, Package, TrendingUp, Star, CheckCircle, DollarSign, Coins } from "lucide-react";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -36,41 +36,93 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="px-6 py-24 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-blue-600/5"></div>
-        <div className="max-w-4xl mx-auto relative">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 mb-8">
-            <Star className="w-4 h-4 mr-2" />
-            <span className="text-sm font-medium">Plataforma líder en gestión de suministros</span>
+        
+        {/* Animated coins background */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <Coins className="absolute top-20 left-10 w-8 h-8 text-amber-400 opacity-30 animate-bounce" style={{ animationDelay: '0s' }} />
+          <DollarSign className="absolute top-32 right-20 w-6 h-6 text-green-500 opacity-40 animate-pulse" style={{ animationDelay: '1s' }} />
+          <Coins className="absolute bottom-40 left-1/4 w-10 h-10 text-yellow-500 opacity-25 animate-bounce" style={{ animationDelay: '2s' }} />
+          <DollarSign className="absolute top-60 right-1/3 w-12 h-12 text-emerald-400 opacity-20 animate-pulse" style={{ animationDelay: '0.5s' }} />
+        </div>
+
+        <div className="max-w-6xl mx-auto relative grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Text Content */}
+          <div className="text-left">
+            <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 mb-8">
+              <Star className="w-4 h-4 mr-2" />
+              <span className="text-sm font-medium">Plataforma líder en gestión de suministros</span>
+            </div>
+            
+            <h1 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
+              <span className="bg-gradient-to-r from-slate-900 via-primary to-blue-600 bg-clip-text text-transparent">
+                Conecta Proveedores
+              </span>
+              <br />
+              <span className="text-slate-700">con Restaurantes</span>
+            </h1>
+            
+            <p className="text-xl text-slate-600 mb-12 leading-relaxed">
+              La plataforma integral que revoluciona la gestión de suministros, 
+              optimiza costos y facilita la comunicación entre proveedores y restaurantes.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-start items-start">
+              <Button 
+                size="lg" 
+                onClick={() => navigate('/login')}
+                className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
+              >
+                Comenzar Gratis
+                <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="px-8 py-4 text-lg rounded-xl border-2 border-primary/20 hover:border-primary/40 transition-all duration-200"
+              >
+                Ver Demo
+              </Button>
+            </div>
           </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-            <span className="bg-gradient-to-r from-slate-900 via-primary to-blue-600 bg-clip-text text-transparent">
-              Conecta Proveedores
-            </span>
-            <br />
-            <span className="text-slate-700">con Restaurantes</span>
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-            La plataforma integral que revoluciona la gestión de suministros, 
-            optimiza costos y facilita la comunicación entre proveedores y restaurantes.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
-              size="lg" 
-              onClick={() => navigate('/login')}
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
-            >
-              Comenzar Gratis
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="px-8 py-4 text-lg rounded-xl border-2 border-primary/20 hover:border-primary/40 transition-all duration-200"
-            >
-              Ver Demo
-            </Button>
+
+          {/* Platform Image */}
+          <div className="relative">
+            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden transform rotate-3 hover:rotate-0 transition-transform duration-500">
+              <img 
+                src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2426&q=80"
+                alt="SupplyChain Pro en uso"
+                className="w-full h-80 object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
+              
+              {/* Floating UI elements */}
+              <div className="absolute top-4 left-4 bg-white rounded-lg p-3 shadow-lg animate-float">
+                <div className="flex items-center space-x-2">
+                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium">Proveedor conectado</span>
+                </div>
+              </div>
+              
+              <div className="absolute bottom-4 right-4 bg-white rounded-lg p-3 shadow-lg animate-float" style={{ animationDelay: '1s' }}>
+                <div className="flex items-center space-x-2">
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                  <span className="text-sm font-medium">+15% ahorro</span>
+                </div>
+              </div>
+            </div>
+            
+            {/* Animated money elements */}
+            <div className="absolute -top-4 -right-4 animate-bounce">
+              <div className="bg-green-500 text-white rounded-full p-3 shadow-lg">
+                <DollarSign className="w-6 h-6" />
+              </div>
+            </div>
+            
+            <div className="absolute -bottom-4 -left-4 animate-pulse">
+              <div className="bg-amber-500 text-white rounded-full p-3 shadow-lg">
+                <Coins className="w-6 h-6" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -196,6 +248,20 @@ const Landing = () => {
           </p>
         </div>
       </footer>
+
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-10px);
+          }
+        }
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   );
 };
