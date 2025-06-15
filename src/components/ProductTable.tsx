@@ -43,32 +43,32 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
   });
 
   const getPriceColor = (price: number) => {
-    if (price < 50) return 'text-green-600 bg-green-50';
-    if (price < 200) return 'text-yellow-600 bg-yellow-50';
-    return 'text-red-600 bg-red-50';
+    if (price < 50) return 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/30';
+    if (price < 200) return 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-900/30';
+    return 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30';
   };
 
   const getQualityIcon = (quality: string) => {
     switch (quality) {
       case 'Alta': return <Star className="w-4 h-4 text-yellow-500 fill-current" />;
-      case 'Media': return <Star className="w-4 h-4 text-gray-400 fill-current" />;
-      default: return <Star className="w-4 h-4 text-gray-300" />;
+      case 'Media': return <Star className="w-4 h-4 text-gray-400 dark:text-gray-500 fill-current" />;
+      default: return <Star className="w-4 h-4 text-gray-300 dark:text-gray-600" />;
     }
   };
 
   const getDeliveryColor = (days: number) => {
-    if (days <= 2) return 'text-green-600 bg-green-50';
-    if (days <= 5) return 'text-yellow-600 bg-yellow-50';
-    return 'text-red-600 bg-red-50';
+    if (days <= 2) return 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-900/30';
+    if (days <= 5) return 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-900/30';
+    return 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-900/30';
   };
 
   if (products.length === 0) {
     return (
       <Card>
         <CardContent className="py-16 text-center">
-          <Package className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No hay productos</h3>
-          <p className="text-gray-600">
+          <Package className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">No hay productos</h3>
+          <p className="text-gray-600 dark:text-gray-400">
             {isSupplierView 
               ? 'Agrega tu primer producto para comenzar a vender'
               : 'No se encontraron productos que coincidan con tus filtros'
@@ -83,46 +83,46 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
     <div className="space-y-4">
       {/* Desktop Table */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full border-collapse bg-white rounded-lg overflow-hidden shadow-sm">
-          <thead className="bg-gray-50">
+        <table className="w-full border-collapse bg-white dark:bg-slate-800 rounded-lg overflow-hidden shadow-sm">
+          <thead className="bg-gray-50 dark:bg-slate-700">
             <tr>
               <th 
-                className="text-left p-4 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 w-2/5"
+                className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600 w-2/5"
                 onClick={() => handleSort('name')}
               >
                 Producto
               </th>
-              <th className="text-left p-4 font-semibold text-gray-900 w-24">Tamaño</th>
+              <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100 w-24">Tamaño</th>
               <th 
-                className="text-left p-4 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 w-32"
+                className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600 w-32"
                 onClick={() => handleSort('price')}
               >
                 Precio
               </th>
-              <th className="text-left p-4 font-semibold text-gray-900 w-24">Calidad</th>
+              <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100 w-24">Calidad</th>
               <th 
-                className="text-left p-4 font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 w-24"
+                className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100 cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-600 w-24"
                 onClick={() => handleSort('deliveryDays')}
               >
                 Entrega
               </th>
               {!isSupplierView && (
-                <th className="text-left p-4 font-semibold text-gray-900 w-32">Proveedor</th>
+                <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100 w-32">Proveedor</th>
               )}
-              <th className="text-left p-4 font-semibold text-gray-900 w-32">Acciones</th>
+              <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100 w-32">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {sortedProducts.map((product) => (
-              <tr key={product.id} className="border-t hover:bg-gray-50 transition-colors">
+              <tr key={product.id} className="border-t border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
                 <td className="p-4">
                   <div>
-                    <div className="font-bold text-lg text-gray-900">{product.name}</div>
-                    <div className="text-sm text-gray-600">{product.brand}</div>
+                    <div className="font-bold text-lg text-gray-900 dark:text-gray-100">{product.name}</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{product.brand}</div>
                   </div>
                 </td>
                 <td className="p-4">
-                  <span className="text-sm font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-md">
+                  <span className="text-sm font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md">
                     {product.size} {product.dimension}
                   </span>
                 </td>
@@ -134,12 +134,12 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
                 <td className="p-4">
                   <div className="flex items-center space-x-1">
                     {getQualityIcon(product.quality)}
-                    <span className="text-sm font-medium">{product.quality}</span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{product.quality}</span>
                   </div>
                 </td>
                 <td className="p-4">
                   <div className="flex items-center space-x-1">
-                    <Clock className="w-4 h-4 text-gray-400" />
+                    <Clock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
                     <span className={`text-sm font-medium px-2 py-1 rounded-md ${getDeliveryColor(product.deliveryDays)}`}>
                       {product.deliveryDays} días
                     </span>
@@ -149,7 +149,7 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
                   <td className="p-4">
                     <button
                       onClick={() => onSupplierClick?.(product.supplierId)}
-                      className="text-amber-600 hover:text-amber-800 font-medium text-sm hover:underline"
+                      className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 font-medium text-sm hover:underline"
                     >
                       {product.supplierName}
                     </button>
@@ -163,7 +163,7 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
                           size="sm"
                           variant="outline"
                           onClick={() => onEdit(product)}
-                          className="hover:bg-blue-50"
+                          className="hover:bg-blue-50 dark:hover:bg-blue-900/30"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -171,7 +171,7 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
                           size="sm"
                           variant="outline"
                           onClick={() => onDelete(product.id)}
-                          className="hover:bg-red-50 text-red-600"
+                          className="hover:bg-red-50 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -181,7 +181,7 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
                         size="sm"
                         variant="outline"
                         onClick={() => onSupplierClick?.(product.supplierId)}
-                        className="hover:bg-amber-50"
+                        className="hover:bg-amber-50 dark:hover:bg-amber-900/30"
                       >
                         <Eye className="w-4 h-4 mr-1" />
                         Ver Proveedor
@@ -202,9 +202,9 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
             <div className="space-y-3">
               <div className="flex justify-between items-start">
                 <div>
-                  <h3 className="font-bold text-lg text-gray-900">{product.name}</h3>
-                  <p className="text-sm text-gray-600">{product.brand}</p>
-                  <span className="text-sm font-medium text-amber-600 bg-amber-50 px-2 py-1 rounded-md inline-block mt-1">
+                  <h3 className="font-bold text-lg text-gray-900 dark:text-gray-100">{product.name}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">{product.brand}</p>
+                  <span className="text-sm font-medium text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded-md inline-block mt-1">
                     {product.size} {product.dimension}
                   </span>
                 </div>
@@ -216,7 +216,7 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
               <div className="flex flex-wrap gap-2">
                 <div className="flex items-center space-x-1">
                   {getQualityIcon(product.quality)}
-                  <span className="text-sm">{product.quality}</span>
+                  <span className="text-sm text-gray-900 dark:text-gray-100">{product.quality}</span>
                 </div>
                 <span className={`text-sm px-2 py-1 rounded-md ${getDeliveryColor(product.deliveryDays)}`}>
                   {product.deliveryDays} días
@@ -224,11 +224,11 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
               </div>
 
               {!isSupplierView && (
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 dark:text-gray-400">
                   Proveedor: 
                   <button
                     onClick={() => onSupplierClick?.(product.supplierId)}
-                    className="text-amber-600 hover:text-amber-800 font-medium ml-1"
+                    className="text-amber-600 dark:text-amber-400 hover:text-amber-800 dark:hover:text-amber-300 font-medium ml-1"
                   >
                     {product.supplierName}
                   </button>
@@ -251,7 +251,7 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
                       size="sm"
                       variant="outline"
                       onClick={() => onDelete(product.id)}
-                      className="text-red-600"
+                      className="text-red-600 dark:text-red-400"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
