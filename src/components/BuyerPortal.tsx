@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Package, Truck, Star } from "lucide-react";
 import { Product } from '../types/Product';
 import { useUser } from '../contexts/UserContext';
+import { useTranslation } from '../contexts/LanguageContext';
 import MenuManagement from './MenuManagement';
 import ProductTable from './ProductTable';
 import IngredientCostAnalysis from './IngredientCostAnalysis';
@@ -23,6 +25,7 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedQuality, setSelectedQuality] = useState('all');
+  const { t } = useTranslation();
 
   // Get unique categories and qualities for filters
   const categories = Array.from(new Set(products.map(p => p.category)));
@@ -48,15 +51,15 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Portal del Comprador</h1>
-        <p className="text-gray-600">Explora productos de proveedores y gestiona tu menú</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('buyerPortal.title')}</h1>
+        <p className="text-gray-600">{t('buyerPortal.description')}</p>
       </div>
 
       <Tabs value={activeTab} defaultValue="catalog" className="space-y-6" onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="catalog">Catálogo de Productos</TabsTrigger>
-          <TabsTrigger value="menu">Mi Menú</TabsTrigger>
-          <TabsTrigger value="analysis">Análisis de Costos</TabsTrigger>
+          <TabsTrigger value="catalog">{t('buyerPortal.tabs.catalog')}</TabsTrigger>
+          <TabsTrigger value="menu">{t('buyerPortal.tabs.menu')}</TabsTrigger>
+          <TabsTrigger value="analysis">{t('buyerPortal.tabs.costAnalysis')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="catalog" className="space-y-6">
@@ -64,16 +67,16 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
               type="search"
-              placeholder="Buscar productos..."
+              placeholder={t('buyerPortal.searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <Select onValueChange={setSelectedCategory} defaultValue={selectedCategory}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Categoría" />
+                <SelectValue placeholder={t('buyerPortal.filter.category')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas las categorías</SelectItem>
+                <SelectItem value="all">{t('buyerPortal.filter.allCategories')}</SelectItem>
                 {categories.map(category => (
                   <SelectItem key={category} value={category}>{category}</SelectItem>
                 ))}
@@ -81,10 +84,10 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
             </Select>
             <Select onValueChange={setSelectedQuality} defaultValue={selectedQuality}>
               <SelectTrigger className="w-full">
-                <SelectValue placeholder="Calidad" />
+                <SelectValue placeholder={t('buyerPortal.filter.quality')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todas las calidades</SelectItem>
+                <SelectItem value="all">{t('buyerPortal.filter.allQualities')}</SelectItem>
                 {qualities.map(quality => (
                   <SelectItem key={quality} value={quality}>{quality}</SelectItem>
                 ))}

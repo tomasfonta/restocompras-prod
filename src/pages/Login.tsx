@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ArrowLeft, Mail } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUser } from '../contexts/UserContext';
+import { useTranslation } from '../contexts/LanguageContext';
 import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
@@ -14,6 +15,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { login } = useUser();
+  const { t } = useTranslation();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,14 +25,14 @@ const Login = () => {
     
     if (success) {
       toast({
-        title: "Inicio de sesión exitoso",
-        description: "Bienvenido de vuelta",
+        title: t('toast.loginSuccess.title'),
+        description: t('toast.loginSuccess.description'),
       });
       navigate('/dashboard');
     } else {
       toast({
-        title: "Error de autenticación",
-        description: "Email no encontrado",
+        title: t('toast.loginError.title'),
+        description: t('toast.loginError.description'),
         variant: "destructive",
       });
     }
@@ -45,7 +47,7 @@ const Login = () => {
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center text-slate-600 hover:text-slate-900 mb-6">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Volver al inicio
+            {t('login.backToHome')}
           </Link>
           
           <div className="flex items-center justify-center space-x-3 mb-4">
@@ -54,28 +56,28 @@ const Login = () => {
             </div>
             <h1 className="text-3xl font-bold text-slate-900">RestoCompras</h1>
           </div>
-          <p className="text-slate-600">Accede a tu cuenta para comenzar</p>
+          <p className="text-slate-600">{t('login.description')}</p>
         </div>
 
         <Card className="shadow-lg border-primary/20">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center text-slate-900">Iniciar Sesión</CardTitle>
+            <CardTitle className="text-2xl text-center text-slate-900">{t('login.cardTitle')}</CardTitle>
             <CardDescription className="text-center text-slate-600">
-              Ingresa tu correo electrónico para acceder a la plataforma
+              {t('login.cardDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium text-slate-700">
-                  Correo Electrónico
+                  {t('login.emailLabel')}
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
                   <Input
                     id="email"
                     type="email"
-                    placeholder="tu@email.com"
+                    placeholder={t('login.emailPlaceholder')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10 border-slate-300 focus:border-primary focus:ring-primary"
@@ -89,16 +91,16 @@ const Login = () => {
                 className="w-full bg-primary hover:bg-primary/90 text-white py-2.5"
                 disabled={isLoading}
               >
-                {isLoading ? 'Ingresando...' : 'Ingresar'}
+                {isLoading ? t('login.loadingButton') : t('login.submitButton')}
               </Button>
             </form>
 
             <div className="text-center space-y-4">
               <div className="border-t pt-4">
                 <p className="text-slate-600 text-sm">
-                  ¿No tienes cuenta?{' '}
+                  {t('login.noAccount')}{' '}
                   <button className="text-primary hover:text-primary/80 font-medium">
-                    Regístrate aquí
+                    {t('login.register')}
                   </button>
                 </p>
               </div>
@@ -110,10 +112,10 @@ const Login = () => {
         <Card className="mt-6 bg-primary/5 border-primary/20">
           <CardContent className="pt-6">
             <div className="text-center">
-              <h3 className="font-semibold text-primary mb-2">Usuarios Demo</h3>
+              <h3 className="font-semibold text-primary mb-2">{t('login.demoUsers')}</h3>
               <div className="text-slate-700 text-sm space-y-2">
-                <p><strong>Restaurante:</strong> restaurante@email.com</p>
-                <p><strong>Proveedor:</strong> proveedor@email.com</p>
+                <p><strong>{t('login.demoRestaurant')}:</strong> restaurante@email.com</p>
+                <p><strong>{t('login.demoSupplier')}:</strong> proveedor@email.com</p>
               </div>
             </div>
           </CardContent>
