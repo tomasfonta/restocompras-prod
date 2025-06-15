@@ -9,6 +9,7 @@ import { ArrowLeft, Save, User, Building, Mail, Phone, MapPin } from "lucide-rea
 import { useNavigate } from "react-router-dom";
 import { useUser } from '../contexts/UserContext';
 import { toast } from "@/hooks/use-toast";
+import GoogleMapSelector from '../components/GoogleMapSelector';
 
 const ProfileSettings = () => {
   const navigate = useNavigate();
@@ -33,6 +34,10 @@ const ProfileSettings = () => {
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAddressSelect = (address: string) => {
+    handleChange('address', address);
   };
 
   if (!currentUser) {
@@ -123,9 +128,9 @@ const ProfileSettings = () => {
                 />
               </div>
 
-              {/* Address */}
+              {/* Address with Map Selector */}
               <div className="space-y-2">
-                <Label htmlFor="address" className="text-sm font-medium text-gray-700 flex items-center">
+                <Label className="text-sm font-medium text-gray-700 flex items-center">
                   <MapPin className="w-4 h-4 mr-2" />
                   Dirección
                 </Label>
@@ -135,7 +140,12 @@ const ProfileSettings = () => {
                   value={formData.address}
                   onChange={(e) => handleChange('address', e.target.value)}
                   className="border-gray-300 focus:border-amber-500 focus:ring-amber-500"
+                  placeholder="Dirección manual o selecciona en el mapa"
                   required
+                />
+                <GoogleMapSelector 
+                  onAddressSelect={handleAddressSelect}
+                  defaultAddress={formData.address}
                 />
               </div>
 

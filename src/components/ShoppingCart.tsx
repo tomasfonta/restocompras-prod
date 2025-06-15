@@ -12,15 +12,9 @@ const ShoppingCart = () => {
   const { cartItems, removeFromCart, updateQuantity, getTotalCost } = useShoppingCart();
   const { t } = useTranslation();
 
-  const handleQuantityChange = (productId: string, newQuantity: number, monthlyAmount: number) => {
+  const handleQuantityChange = (productId: string, newQuantity: number) => {
     if (newQuantity > 0) {
-      updateQuantity(productId, newQuantity, monthlyAmount);
-    }
-  };
-
-  const handleMonthlyAmountChange = (productId: string, quantity: number, newMonthlyAmount: number) => {
-    if (newMonthlyAmount > 0) {
-      updateQuantity(productId, quantity, newMonthlyAmount);
+      updateQuantity(productId, newQuantity);
     }
   };
 
@@ -63,7 +57,7 @@ const ShoppingCart = () => {
     `;
 
     Object.entries(groupedBySupplier).forEach(([supplierId, { supplier, items }]) => {
-      const supplierTotal = items.reduce((sum, item) => sum + (item.product.price * item.monthlyAmount), 0);
+      const supplierTotal = items.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
       
       reportHTML += `
         <div class="supplier-section">
@@ -86,9 +80,8 @@ const ShoppingCart = () => {
                 <th>Categoría</th>
                 <th>Calidad</th>
                 <th>Cantidad</th>
-                <th>Mensual</th>
                 <th>Precio Unit.</th>
-                <th>Total Mensual</th>
+                <th>Total</th>
               </tr>
             </thead>
             <tbody>
@@ -103,9 +96,8 @@ const ShoppingCart = () => {
             <td>${item.product.category}</td>
             <td>${item.product.quality}</td>
             <td>${item.quantity}</td>
-            <td>${item.monthlyAmount}</td>
             <td>$${item.product.price.toFixed(2)}</td>
-            <td>$${(item.product.price * item.monthlyAmount).toFixed(2)}</td>
+            <td>$${(item.product.price * item.quantity).toFixed(2)}</td>
           </tr>
         `;
       });
@@ -126,8 +118,7 @@ const ShoppingCart = () => {
           <h3>Resumen del Pedido</h3>
           <p><strong>Total de Proveedores:</strong> ${Object.keys(groupedBySupplier).length}</p>
           <p><strong>Total de Productos:</strong> ${cartItems.length}</p>
-          <p><strong>Costo Total Mensual:</strong> $${getTotalCost().toFixed(2)}</p>
-          <p><strong>Costo Total Anual:</strong> $${(getTotalCost() * 12).toFixed(2)}</p>
+          <p><strong>Costo Total:</strong> $${getTotalCost().toFixed(2)}</p>
         </div>
       </body>
       </html>
@@ -217,18 +208,7 @@ const ShoppingCart = () => {
                       <Input
                         type="number"
                         value={item.quantity}
-                        onChange={(e) => handleQuantityChange(item.product.id, parseInt(e.target.value) || 0, item.monthlyAmount)}
-                        className="w-20"
-                        min="1"
-                      />
-                    </div>
-                    
-                    <div className="text-right">
-                      <div className="text-sm text-gray-600">Mensual</div>
-                      <Input
-                        type="number"
-                        value={item.monthlyAmount}
-                        onChange={(e) => handleMonthlyAmountChange(item.product.id, item.quantity, parseInt(e.target.value) || 0)}
+                        onChange={(e) => handleQuantityChange(item.product.id, parseInt(e.target.value) || 0)}
                         className="w-20"
                         min="1"
                       />
@@ -240,8 +220,8 @@ const ShoppingCart = () => {
                     </div>
                     
                     <div className="text-right">
-                      <div className="text-sm text-gray-600">Total Mensual</div>
-                      <div className="font-bold text-lg">${(item.product.price * item.monthlyAmount).toFixed(2)}</div>
+                      <div className="text-sm text-gray-600">Total</div>
+                      <div className="font-bold text-lg">${(item.product.price * item.quantity).toFixed(2)}</div>
                     </div>
                     
                     <Button

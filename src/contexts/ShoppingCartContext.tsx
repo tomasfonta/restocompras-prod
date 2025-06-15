@@ -5,14 +5,13 @@ import { Product } from '../types/Product';
 interface CartItem {
   product: Product;
   quantity: number;
-  monthlyAmount: number;
 }
 
 interface ShoppingCartContextType {
   cartItems: CartItem[];
-  addToCart: (product: Product, quantity: number, monthlyAmount: number) => void;
+  addToCart: (product: Product, quantity: number) => void;
   removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number, monthlyAmount: number) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   getTotalCost: () => number;
 }
@@ -22,17 +21,17 @@ const ShoppingCartContext = createContext<ShoppingCartContextType | undefined>(u
 export const ShoppingCartProvider = ({ children }: { children: ReactNode }) => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  const addToCart = (product: Product, quantity: number, monthlyAmount: number) => {
+  const addToCart = (product: Product, quantity: number) => {
     setCartItems(prev => {
       const existingItem = prev.find(item => item.product.id === product.id);
       if (existingItem) {
         return prev.map(item =>
           item.product.id === product.id
-            ? { ...item, quantity, monthlyAmount }
+            ? { ...item, quantity }
             : item
         );
       }
-      return [...prev, { product, quantity, monthlyAmount }];
+      return [...prev, { product, quantity }];
     });
   };
 
@@ -40,11 +39,11 @@ export const ShoppingCartProvider = ({ children }: { children: ReactNode }) => {
     setCartItems(prev => prev.filter(item => item.product.id !== productId));
   };
 
-  const updateQuantity = (productId: string, quantity: number, monthlyAmount: number) => {
+  const updateQuantity = (productId: string, quantity: number) => {
     setCartItems(prev =>
       prev.map(item =>
         item.product.id === productId
-          ? { ...item, quantity, monthlyAmount }
+          ? { ...item, quantity }
           : item
       )
     );
@@ -55,7 +54,7 @@ export const ShoppingCartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const getTotalCost = () => {
-    return cartItems.reduce((total, item) => total + (item.product.price * item.monthlyAmount), 0);
+    return cartItems.reduce((total, item) => total + (item.product.price * item.quantity), 0);
   };
 
   return (
