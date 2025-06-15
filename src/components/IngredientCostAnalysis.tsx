@@ -1,12 +1,15 @@
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, Package, Calendar, CalendarDays } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DollarSign, Package, Calendar, CalendarDays, ShoppingCart } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useUser } from '../contexts/UserContext';
 import { useData } from '../contexts/DataContext';
 import { useTranslation } from '../contexts/LanguageContext';
+import { useShoppingCart } from '../contexts/ShoppingCartContext';
 import SavingsDashboard from './SavingsDashboard';
+import { toast } from "sonner";
 
 const conversionFactors: { [key: string]: { baseUnit: string; factor: number } } = {
   g: { baseUnit: 'g', factor: 1 },
@@ -47,6 +50,7 @@ const IngredientCostAnalysis: React.FC = () => {
   const { currentUser } = useUser();
   const { getDishesByUser, products } = useData();
   const { t } = useTranslation();
+  const { addToCart } = useShoppingCart();
 
   const userDishes = currentUser ? getDishesByUser(currentUser.id) : [];
   const dishesWithDefaultServings = userDishes.map((dish: any) => ({
@@ -168,6 +172,13 @@ const IngredientCostAnalysis: React.FC = () => {
   const totalMonthlySavings = ingredientAnalysis.reduce((sum, item) => sum + item.monthlySavings, 0);
   const totalAnnualSavings = ingredientAnalysis.reduce((sum, item) => sum + item.annualSavings, 0);
 
+  const handleAddToCart = (product: any, monthlyServings: number) => {
+    addToCart(product, 1, monthlyServings);
+    toast.success(`${product.name} agregado al carrito`, {
+      description: `Cantidad mensual: ${monthlyServings}`
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="mb-6">
@@ -251,6 +262,7 @@ const IngredientCostAnalysis: React.FC = () => {
                   <TableHead>Ahorro Mensual</TableHead>
                   <TableHead>Ahorro Anual</TableHead>
                   <TableHead>Platos</TableHead>
+                  <TableHead>Acción</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -324,6 +336,20 @@ const IngredientCostAnalysis: React.FC = () => {
                           </span>
                         )}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {ingredient.cheapestAlternative ? (
+                        <Button
+                          size="sm"
+                          onClick={() => handleAddToCart(ingredient.cheapestAlternative, ingredient.totalMonthlyServings)}
+                          className="flex items-center space-x-1"
+                        >
+                          <ShoppingCart className="w-4 h-4" />
+                          <span>Agregar</span>
+                        </Button>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))}

@@ -61,6 +61,7 @@
   "costAnalysis.savingsDashboard": "Monthly Savings Dashboard",
   "costAnalysis.month": "Month",
   "costAnalysis.savings": "Savings",
+  "costAnalysis.addToCart": "Add to Cart",
   "shoppingCart.title": "Shopping Cart",
   "shoppingCart.description": "Products selected for purchase with supplier contact information",
   "shoppingCart.addToCart": "Add to Cart",
@@ -70,5 +71,6 @@
   "shoppingCart.phone": "Phone",
   "shoppingCart.email": "Email",
   "shoppingCart.emptyCart": "Your shopping cart is empty",
-  "shoppingCart.addProducts": "Add products from the catalog to start shopping"
+  "shoppingCart.addProducts": "Add products from the catalog to start shopping",
+  "shoppingCart.printReport": "Print Report"
 }

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { ShoppingCart as CartIcon, Phone, Mail, Trash2 } from "lucide-react";
+import { ShoppingCart as CartIcon, Phone, Mail, Trash2, Printer } from "lucide-react";
 import { useShoppingCart } from '../contexts/ShoppingCartContext';
 import { useTranslation } from '../contexts/LanguageContext';
 
@@ -22,6 +22,118 @@ const ShoppingCart = () => {
     if (newMonthlyAmount > 0) {
       updateQuantity(productId, quantity, newMonthlyAmount);
     }
+  };
+
+  const handlePrintReport = () => {
+    const reportContent = generateReportContent();
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(reportContent);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const generateReportContent = () => {
+    const currentDate = new Date().toLocaleDateString('es-ES');
+    
+    let reportHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Informe de Pedido - ${currentDate}</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          .header { text-align: center; margin-bottom: 30px; }
+          .supplier-section { margin-bottom: 30px; page-break-inside: avoid; }
+          .supplier-header { background-color: #f5f5f5; padding: 15px; margin-bottom: 15px; }
+          .product-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+          .product-table th, .product-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          .product-table th { background-color: #f9f9f9; }
+          .total-section { background-color: #e8f5e8; padding: 15px; margin-top: 20px; }
+          .contact-info { background-color: #f0f8ff; padding: 10px; margin-bottom: 15px; }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <h1>Informe de Pedido</h1>
+          <p>Fecha: ${currentDate}</p>
+          <p>Total General: $${getTotalCost().toFixed(2)}</p>
+        </div>
+    `;
+
+    Object.entries(groupedBySupplier).forEach(([supplierId, { supplier, items }]) => {
+      const supplierTotal = items.reduce((sum, item) => sum + (item.product.price * item.monthlyAmount), 0);
+      
+      reportHTML += `
+        <div class="supplier-section">
+          <div class="supplier-header">
+            <h2>${supplier}</h2>
+          </div>
+          
+          <div class="contact-info">
+            <strong>Información de Contacto:</strong><br>
+            Teléfono: +54 11 1234-5678<br>
+            Email: contacto@${supplier.toLowerCase().replace(/\s+/g, '')}.com
+          </div>
+
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Marca</th>
+                <th>Tamaño</th>
+                <th>Categoría</th>
+                <th>Calidad</th>
+                <th>Cantidad</th>
+                <th>Mensual</th>
+                <th>Precio Unit.</th>
+                <th>Total Mensual</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+
+      items.forEach(item => {
+        reportHTML += `
+          <tr>
+            <td>${item.product.name}</td>
+            <td>${item.product.brand}</td>
+            <td>${item.product.size}${item.product.dimension}</td>
+            <td>${item.product.category}</td>
+            <td>${item.product.quality}</td>
+            <td>${item.quantity}</td>
+            <td>${item.monthlyAmount}</td>
+            <td>$${item.product.price.toFixed(2)}</td>
+            <td>$${(item.product.price * item.monthlyAmount).toFixed(2)}</td>
+          </tr>
+        `;
+      });
+
+      reportHTML += `
+            </tbody>
+          </table>
+          
+          <div style="text-align: right; margin-top: 10px;">
+            <strong>Subtotal ${supplier}: $${supplierTotal.toFixed(2)}</strong>
+          </div>
+        </div>
+      `;
+    });
+
+    reportHTML += `
+        <div class="total-section">
+          <h3>Resumen del Pedido</h3>
+          <p><strong>Total de Proveedores:</strong> ${Object.keys(groupedBySupplier).length}</p>
+          <p><strong>Total de Productos:</strong> ${cartItems.length}</p>
+          <p><strong>Costo Total Mensual:</strong> $${getTotalCost().toFixed(2)}</p>
+          <p><strong>Costo Total Anual:</strong> $${(getTotalCost() * 12).toFixed(2)}</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    return reportHTML;
   };
 
   const groupedBySupplier = cartItems.reduce((acc, item) => {
@@ -50,9 +162,15 @@ const ShoppingCart = () => {
 
   return (
     <div className="space-y-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('shoppingCart.title')}</h2>
-        <p className="text-gray-600">{t('shoppingCart.description')}</p>
+      <div className="mb-6 flex justify-between items-center">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('shoppingCart.title')}</h2>
+          <p className="text-gray-600">{t('shoppingCart.description')}</p>
+        </div>
+        <Button onClick={handlePrintReport} className="flex items-center space-x-2">
+          <Printer className="w-4 h-4" />
+          <span>Imprimir Informe</span>
+        </Button>
       </div>
 
       {/* Total Cost Summary */}

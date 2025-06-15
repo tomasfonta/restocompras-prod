@@ -61,6 +61,7 @@
   "costAnalysis.savingsDashboard": "Dashboard de Ahorros Mensuales",
   "costAnalysis.month": "Mes",
   "costAnalysis.savings": "Ahorros",
+  "costAnalysis.addToCart": "Agregar al Carrito",
   "shoppingCart.title": "Carrito de Compras",
   "shoppingCart.description": "Productos seleccionados para compra con información de contacto del proveedor",
   "shoppingCart.addToCart": "Agregar al Carrito",
@@ -70,5 +71,6 @@
   "shoppingCart.phone": "Teléfono",
   "shoppingCart.email": "Email",
   "shoppingCart.emptyCart": "Tu carrito de compras está vacío",
-  "shoppingCart.addProducts": "Agrega productos del catálogo para comenzar a comprar"
+  "shoppingCart.addProducts": "Agrega productos del catálogo para comenzar a comprar",
+  "shoppingCart.printReport": "Imprimir Informe"
 }
