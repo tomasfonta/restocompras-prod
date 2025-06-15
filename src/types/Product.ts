@@ -14,5 +14,4 @@ export interface Product {
   supplierProductId?: string; // Identificación del proveedor (no visible en tablas)
   inStock: boolean;
   lastUpdated: string;
-  imageUrl?: string; // Nueva propiedad para la imagen del producto
 }
