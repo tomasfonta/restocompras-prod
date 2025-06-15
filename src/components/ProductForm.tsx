@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
+import { Upload, X } from "lucide-react";
 import { Product } from '../types/Product';
 import { CATEGORIES } from '../types/Category';
 import { DIMENSIONS } from '../types/Dimension';
@@ -28,8 +29,11 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
     supplierId: 'user-2',
     supplierName: 'Lácteos del Valle',
     inStock: true,
-    lastUpdated: new Date().toISOString()
+    lastUpdated: new Date().toISOString(),
+    imageUrl: ''
   });
+
+  const [imagePreview, setImagePreview] = useState<string>('');
 
   useEffect(() => {
     if (initialData) {
@@ -46,8 +50,10 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
         supplierId: initialData.supplierId,
         supplierName: initialData.supplierName,
         inStock: initialData.inStock,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        imageUrl: initialData.imageUrl || ''
       });
+      setImagePreview(initialData.imageUrl || '');
     } else {
       // Reset form for new product
       setFormData({
@@ -62,10 +68,30 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
         supplierId: 'user-2',
         supplierName: 'Lácteos del Valle',
         inStock: true,
-        lastUpdated: new Date().toISOString()
+        lastUpdated: new Date().toISOString(),
+        imageUrl: ''
       });
+      setImagePreview('');
     }
   }, [initialData]);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setImagePreview(imageUrl);
+        setFormData({...formData, imageUrl});
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setImagePreview('');
+    setFormData({...formData, imageUrl: ''});
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -194,6 +220,48 @@ const ProductForm = ({ initialData, onSubmit, onCancel }: ProductFormProps) => {
               onChange={(e) => setFormData({...formData, deliveryDays: parseInt(e.target.value) || 1})}
               required
             />
+          </div>
+
+          {/* Image Upload Section */}
+          <div>
+            <Label htmlFor="image">Imagen del Producto</Label>
+            <div className="mt-2">
+              {imagePreview ? (
+                <div className="relative inline-block">
+                  <img 
+                    src={imagePreview} 
+                    alt="Vista previa" 
+                    className="w-32 h-32 object-cover rounded-lg border"
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0"
+                    onClick={removeImage}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
+                  <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                  <p className="text-sm text-gray-600 mb-2">Haz clic para subir una imagen</p>
+                  <Input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <Label htmlFor="image" className="cursor-pointer">
+                    <Button type="button" variant="outline" size="sm">
+                      Seleccionar Imagen
+                    </Button>
+                  </Label>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>

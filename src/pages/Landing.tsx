@@ -36,41 +36,79 @@ const Landing = () => {
       {/* Hero Section */}
       <section className="px-6 py-24 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-blue-600/5"></div>
-        <div className="max-w-4xl mx-auto relative">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 mb-8">
-            <Star className="w-4 h-4 mr-2" />
-            <span className="text-sm font-medium">Plataforma líder en gestión de suministros</span>
-          </div>
-          
-          <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
-            <span className="bg-gradient-to-r from-slate-900 via-primary to-blue-600 bg-clip-text text-transparent">
-              Conecta Proveedores
-            </span>
-            <br />
-            <span className="text-slate-700">con Restaurantes</span>
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-            La plataforma integral que revoluciona la gestión de suministros, 
-            optimiza costos y facilita la comunicación entre proveedores y restaurantes.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
-              size="lg" 
-              onClick={() => navigate('/login')}
-              className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
-            >
-              Comenzar Gratis
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="px-8 py-4 text-lg rounded-xl border-2 border-primary/20 hover:border-primary/40 transition-all duration-200"
-            >
-              Ver Demo
-            </Button>
+        <div className="max-w-7xl mx-auto relative">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="text-left">
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 mb-8">
+                <Star className="w-4 h-4 mr-2" />
+                <span className="text-sm font-medium">Plataforma líder en gestión de suministros</span>
+              </div>
+              
+              <h1 className="text-5xl md:text-6xl font-bold mb-8 leading-tight">
+                <span className="bg-gradient-to-r from-slate-900 via-primary to-blue-600 bg-clip-text text-transparent">
+                  Conecta Proveedores
+                </span>
+                <br />
+                <span className="text-slate-700">con Restaurantes</span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-2xl leading-relaxed">
+                La plataforma integral que revoluciona la gestión de suministros, 
+                optimiza costos y facilita la comunicación entre proveedores y restaurantes.
+              </p>
+              
+              <div className="flex flex-col sm:flex-row gap-4 items-start">
+                <Button 
+                  size="lg" 
+                  onClick={() => navigate('/login')}
+                  className="bg-primary hover:bg-primary/90 text-white px-8 py-4 text-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 group"
+                >
+                  Comenzar Gratis
+                  <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg"
+                  className="px-8 py-4 text-lg rounded-xl border-2 border-primary/20 hover:border-primary/40 transition-all duration-200"
+                >
+                  Ver Demo
+                </Button>
+              </div>
+            </div>
+
+            {/* Modern Platform Image */}
+            <div className="relative">
+              <div className="relative z-10 bg-white rounded-2xl shadow-2xl p-6 transform rotate-1 hover:rotate-0 transition-transform duration-500">
+                <img 
+                  src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=800&q=80" 
+                  alt="Plataforma SupplyChain Pro en uso"
+                  className="w-full h-64 object-cover rounded-lg"
+                />
+                <div className="absolute -top-4 -right-4 bg-green-500 text-white px-4 py-2 rounded-full shadow-lg animate-bounce">
+                  <div className="flex items-center space-x-1">
+                    <TrendingUp className="w-4 h-4" />
+                    <span className="text-sm font-bold">-30% Costos</span>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Floating Elements */}
+              <div className="absolute top-4 left-4 bg-blue-500 text-white p-3 rounded-full shadow-lg animate-pulse z-20">
+                <Package className="w-6 h-6" />
+              </div>
+              
+              <div className="absolute bottom-8 -left-4 bg-amber-500 text-white px-3 py-2 rounded-lg shadow-lg z-20">
+                <div className="flex items-center space-x-2">
+                  <span className="text-2xl">💰</span>
+                  <span className="text-sm font-bold">Ahorro Mensual</span>
+                </div>
+              </div>
+
+              {/* Money/Bills Animation */}
+              <div className="absolute top-1/2 right-0 transform translate-x-8 -translate-y-1/2 z-10">
+                <div className="text-6xl animate-pulse">💸</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
