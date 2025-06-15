@@ -12,13 +12,14 @@ import { Product } from '../types/Product';
 import { useUser } from '../contexts/UserContext';
 import MenuManagement from './MenuManagement';
 import ProductTable from './ProductTable';
+import IngredientCostAnalysis from './IngredientCostAnalysis';
 
 interface BuyerPortalProps {
   products: Product[];
 }
 
 const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('catalog');
   const { currentUser } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -35,14 +36,15 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
                          product.supplierName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     const matchesQuality = selectedQuality === 'all' || product.quality === selectedQuality;
-    
     return matchesSearch && matchesCategory && matchesQuality;
   });
 
   const handleSupplierClick = (supplierId: string) => {
-    console.log('Viewing supplier:', supplierId);
-    // Navigate to supplier profile or show supplier details
+    // For future: Navigate to supplier profile or show supplier details
   };
+
+  // Helper to switch tab to "analisis"
+  const handleAnalysisTab = () => setActiveTab('analysis');
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -51,24 +53,24 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
         <p className="text-gray-600">Explora productos de proveedores y gestiona tu menú</p>
       </div>
 
-      <Tabs defaultValue="catalog" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2">
+      <Tabs value={activeTab} defaultValue="catalog" className="space-y-6" onValueChange={setActiveTab}>
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="catalog">Catálogo de Productos</TabsTrigger>
           <TabsTrigger value="menu">Mi Menú</TabsTrigger>
+          <TabsTrigger value="analysis">Análisis de Costos</TabsTrigger>
         </TabsList>
 
         <TabsContent value="catalog" className="space-y-6">
-          {/* Cost Analysis Button */}
+          {/* Cost Analysis Button - switches to analysis tab */}
           <div className="flex justify-end">
             <Button 
-              onClick={() => navigate('/cost-analysis')}
+              onClick={handleAnalysisTab}
               className="bg-blue-600 hover:bg-blue-700"
             >
               <BarChart3 className="w-4 h-4 mr-2" />
               Análisis de Costos
             </Button>
           </div>
-
           {/* Search and Filters Section */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Input
@@ -112,18 +114,21 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
         </TabsContent>
 
         <TabsContent value="menu" className="space-y-6">
-          {/* Cost Analysis Button */}
+          {/* Cost Analysis Button - switches to analysis tab */}
           <div className="flex justify-end">
             <Button 
-              onClick={() => navigate('/cost-analysis')}
+              onClick={handleAnalysisTab}
               className="bg-blue-600 hover:bg-blue-700"
             >
               <BarChart3 className="w-4 h-4 mr-2" />
               Análisis de Costos
             </Button>
           </div>
-          
           <MenuManagement />
+        </TabsContent>
+
+        <TabsContent value="analysis" className="space-y-6">
+          <IngredientCostAnalysis />
         </TabsContent>
       </Tabs>
     </div>
