@@ -11,6 +11,7 @@ import { Search, Package, Truck, Star, BarChart3 } from "lucide-react";
 import { Product } from '../types/Product';
 import { useUser } from '../contexts/UserContext';
 import MenuManagement from './MenuManagement';
+import ProductTable from './ProductTable';
 
 interface BuyerPortalProps {
   products: Product[];
@@ -38,13 +39,9 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
     return matchesSearch && matchesCategory && matchesQuality;
   });
 
-  const getQualityColor = (quality: string) => {
-    switch (quality.toLowerCase()) {
-      case 'alta': return 'bg-green-100 text-green-800';
-      case 'media': return 'bg-yellow-100 text-yellow-800';
-      case 'baja': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
+  const handleSupplierClick = (supplierId: string) => {
+    console.log('Viewing supplier:', supplierId);
+    // Navigate to supplier profile or show supplier details
   };
 
   return (
@@ -104,46 +101,14 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
             </Select>
           </div>
 
-          {/* Products Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredProducts.map(product => (
-              <Card key={product.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex justify-between items-start">
-                    <CardTitle className="text-lg">{product.name}</CardTitle>
-                    <Badge className={getQualityColor(product.quality)}>
-                      {product.quality}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <span className="text-gray-700 font-medium">Marca:</span> {product.brand}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Package className="w-4 h-4 text-gray-500" />
-                      <span>{product.size}{product.dimension}</span>
-                    </div>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-2">
-                      <Truck className="w-4 h-4 text-gray-500" />
-                      <span>{product.deliveryDays} días</span>
-                    </div>
-                    <div className="text-lg font-semibold text-blue-600">
-                      ${product.price.toFixed(2)}
-                    </div>
-                  </div>
-                  <footer>
-                    <div className="text-sm text-gray-500">
-                      Proveedor: {product.supplierName}
-                    </div>
-                  </footer>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {/* Products Table */}
+          <ProductTable
+            products={filteredProducts}
+            onEdit={() => {}} // Not used in buyer view
+            onDelete={() => {}} // Not used in buyer view
+            isSupplierView={false}
+            onSupplierClick={handleSupplierClick}
+          />
         </TabsContent>
 
         <TabsContent value="menu" className="space-y-6">

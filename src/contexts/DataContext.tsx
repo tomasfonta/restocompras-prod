@@ -19,7 +19,7 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-// Generate sample products for current supplier (user-2) - Only 10 products
+// Generate sample products for current supplier (user-2) - Adding cheese product
 const generateCurrentSupplierProducts = (): Product[] => {
   const products: Product[] = [];
   const validDimensions = DIMENSIONS.map(d => d.name);
@@ -32,6 +32,7 @@ const generateCurrentSupplierProducts = (): Product[] => {
     { name: 'Leche Descremada', category: 'Lácteos', dimension: 'L', size: 1 },
     { name: 'Yogur Natural', category: 'Lácteos', dimension: 'g', size: 200 },
     { name: 'Queso Cremoso', category: 'Lácteos', dimension: 'kg', size: 0.5 },
+    { name: 'Queso', category: 'Lácteos', dimension: 'g', size: 100 }, // New cheese product
     { name: 'Manteca', category: 'Lácteos', dimension: 'g', size: 200 },
     { name: 'Pan Lactal', category: 'Panadería', dimension: 'C', size: 1 },
     { name: 'Aceite de Girasol', category: 'Aceites', dimension: 'L', size: 0.9 },
@@ -40,9 +41,15 @@ const generateCurrentSupplierProducts = (): Product[] => {
     { name: 'Papa', category: 'Verduras', dimension: 'kg', size: 2 }
   ];
 
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < 11; i++) { // Increased to 11 to include cheese
     const template = productTemplates[i];
     const brand = brands[i % brands.length];
+    
+    // Special pricing for the cheese product
+    let price = Math.round((Math.random() * 100 + 20) * 100) / 100;
+    if (template.name === 'Queso') {
+      price = 5.00; // 5 euros for 100g as requested
+    }
     
     products.push({
       id: `current-${i + 1}`,
@@ -50,7 +57,7 @@ const generateCurrentSupplierProducts = (): Product[] => {
       size: template.size,
       dimension: template.dimension,
       brand: brand,
-      price: Math.round((Math.random() * 100 + 20) * 100) / 100,
+      price: price,
       category: template.category,
       quality: qualities[i % qualities.length],
       deliveryDays: Math.floor(Math.random() * 3) + 1,
