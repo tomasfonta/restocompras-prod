@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,7 +24,7 @@ interface CostAnalysis {
   monthlyQuantityNeeded: number;
 }
 
-const IngredientCostAnalysis = ({ dishes, products }: { dishes: Dish[]; products: Product[] }) => {
+const IngredientCostAnalysis: React.FC<IngredientCostAnalysisProps> = ({ dishes, products }) => {
   const { addToCart } = useShoppingCart();
   const { t } = useTranslation();
 
@@ -36,11 +37,11 @@ const IngredientCostAnalysis = ({ dishes, products }: { dishes: Dish[]; products
 
     dishes.forEach(dish => {
       dish.ingredients.forEach(ingredient => {
-        const monthlyQuantity = (ingredient.quantity * dish.monthlyServings) || 0;
+        const monthlyQuantity = (ingredient.quantity * (dish.monthlyServings || 1)) || 0;
         
         if (!analysisMap.has(ingredient.name)) {
           analysisMap.set(ingredient.name, {
-            currentCost: ingredient.cost,
+            currentCost: ingredient.cost || 0,
             totalQuantity: monthlyQuantity,
             alternatives: []
           });
@@ -111,70 +112,77 @@ const IngredientCostAnalysis = ({ dishes, products }: { dishes: Dish[]; products
           </div>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('ingredient')}</TableHead>
-                <TableHead>{t('currentCost')}</TableHead>
-                <TableHead>{t('cheapestAlternative')}</TableHead>
-                <TableHead>{t('monthlyQuantity')}</TableHead>
-                <TableHead>{t('potentialSavings')}</TableHead>
-                <TableHead>{t('actions')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {costAnalysis.map((item, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium">{item.ingredientName}</TableCell>
-                  <TableCell>${item.currentCost.toFixed(2)}</TableCell>
-                  <TableCell>
-                    {item.cheapestAlternative ? (
-                      <div className="space-y-1">
-                        <div className="font-medium">{item.cheapestAlternative.name}</div>
-                        <div className="text-sm text-gray-600">
-                          ${item.cheapestAlternative.price.toFixed(2)} - {item.cheapestAlternative.supplierName}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-gray-500">{t('noAlternativeFound')}</span>
-                    )}
-                  </TableCell>
-                  <TableCell>{item.monthlyQuantityNeeded.toFixed(1)}</TableCell>
-                  <TableCell>
-                    {item.potentialSavings > 0 ? (
-                      <div className="flex items-center space-x-2">
-                        <Badge variant="outline" className="text-green-600 border-green-600">
-                          <TrendingDown className="w-3 h-3 mr-1" />
-                          ${item.potentialSavings.toFixed(2)}
-                        </Badge>
-                        <span className="text-sm text-green-600">
-                          ({item.savingsPercentage.toFixed(1)}%)
-                        </span>
-                      </div>
-                    ) : (
-                      <Badge variant="outline" className="text-gray-500">
-                        <TrendingUp className="w-3 h-3 mr-1" />
-                        {t('noSavings')}
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {item.cheapestAlternative && item.potentialSavings > 0 && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleAddToCart(item.cheapestAlternative!, item.monthlyQuantityNeeded)}
-                        className="flex items-center space-x-1"
-                      >
-                        <ShoppingCart className="w-4 h-4" />
-                        <span>{t('addToCart')}</span>
-                      </Button>
-                    )}
-                  </TableCell>
+          {costAnalysis.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-600 mb-4">No hay ingredientes registrados en tus platos para analizar</p>
+              <p className="text-sm text-gray-500">Agrega algunos platos con ingredientes en la sección de Menú para ver el análisis de costos</p>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>{t('ingredient')}</TableHead>
+                  <TableHead>{t('currentCost')}</TableHead>
+                  <TableHead>{t('cheapestAlternative')}</TableHead>
+                  <TableHead>{t('monthlyQuantity')}</TableHead>
+                  <TableHead>{t('potentialSavings')}</TableHead>
+                  <TableHead>{t('actions')}</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {costAnalysis.map((item, index) => (
+                  <TableRow key={index}>
+                    <TableCell className="font-medium">{item.ingredientName}</TableCell>
+                    <TableCell>${item.currentCost.toFixed(2)}</TableCell>
+                    <TableCell>
+                      {item.cheapestAlternative ? (
+                        <div className="space-y-1">
+                          <div className="font-medium">{item.cheapestAlternative.name}</div>
+                          <div className="text-sm text-gray-600">
+                            ${item.cheapestAlternative.price.toFixed(2)} - {item.cheapestAlternative.supplierName}
+                          </div>
+                        </div>
+                      ) : (
+                        <span className="text-gray-500">{t('noAlternativeFound')}</span>
+                      )}
+                    </TableCell>
+                    <TableCell>{item.monthlyQuantityNeeded.toFixed(1)}</TableCell>
+                    <TableCell>
+                      {item.potentialSavings > 0 ? (
+                        <div className="flex items-center space-x-2">
+                          <Badge variant="outline" className="text-green-600 border-green-600">
+                            <TrendingDown className="w-3 h-3 mr-1" />
+                            ${item.potentialSavings.toFixed(2)}
+                          </Badge>
+                          <span className="text-sm text-green-600">
+                            ({item.savingsPercentage.toFixed(1)}%)
+                          </span>
+                        </div>
+                      ) : (
+                        <Badge variant="outline" className="text-gray-500">
+                          <TrendingUp className="w-3 h-3 mr-1" />
+                          {t('noSavings')}
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {item.cheapestAlternative && item.potentialSavings > 0 && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleAddToCart(item.cheapestAlternative!, item.monthlyQuantityNeeded)}
+                          className="flex items-center space-x-1"
+                        >
+                          <ShoppingCart className="w-4 h-4" />
+                          <span>{t('addToCart')}</span>
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
