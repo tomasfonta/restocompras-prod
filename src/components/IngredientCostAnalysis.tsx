@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +5,8 @@ import { DollarSign, Package, Calendar, CalendarDays } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useUser } from '../contexts/UserContext';
 import { useData } from '../contexts/DataContext';
+import { useTranslation } from '../contexts/LanguageContext';
+import SavingsDashboard from './SavingsDashboard';
 
 const conversionFactors: { [key: string]: { baseUnit: string; factor: number } } = {
   g: { baseUnit: 'g', factor: 1 },
@@ -45,6 +46,7 @@ const getUnitInBase = (quantity: number, unit: string | undefined) => {
 const IngredientCostAnalysis: React.FC = () => {
   const { currentUser } = useUser();
   const { getDishesByUser, products } = useData();
+  const { t } = useTranslation();
 
   const userDishes = currentUser ? getDishesByUser(currentUser.id) : [];
   const dishesWithDefaultServings = userDishes.map((dish: any) => ({
@@ -169,59 +171,59 @@ const IngredientCostAnalysis: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Análisis de Costos</h2>
-        <p className="text-gray-600">Compara los costos de tus ingredientes con alternativas más baratas y calcula ahorros mensuales y anuales</p>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t('costAnalysis.title')}</h2>
+        <p className="text-gray-600">{t('costAnalysis.description')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Costo Total Actual</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('costAnalysis.currentTotalCost')}</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">${totalCurrentCost.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              En {ingredientAnalysis.length} ingredientes
+              En {ingredientAnalysis.length} {t('costAnalysis.ingredients')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ahorro Mensual</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('costAnalysis.monthlySavings')}</CardTitle>
             <Calendar className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">${totalMonthlySavings.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              Ahorro potencial mensual
+              {t('costAnalysis.potentialMonthlySavings')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ahorro Anual</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('costAnalysis.annualSavings')}</CardTitle>
             <CalendarDays className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">${totalAnnualSavings.toFixed(2)}</div>
             <p className="text-xs text-muted-foreground">
-              Ahorro potencial anual
+              {t('costAnalysis.potentialAnnualSavings')}
             </p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Ingredientes</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('costAnalysis.ingredientsCount')}</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{ingredientAnalysis.length}</div>
             <p className="text-xs text-muted-foreground">
-              En {userDishes.length} platos
+              En {userDishes.length} {t('costAnalysis.dishes')}
             </p>
           </CardContent>
         </Card>
@@ -229,12 +231,12 @@ const IngredientCostAnalysis: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Análisis Detallado de Ingredientes</CardTitle>
+          <CardTitle>{t('costAnalysis.detailedAnalysis')}</CardTitle>
         </CardHeader>
         <CardContent>
           {ingredientAnalysis.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-600 mb-4">No tienes ingredientes registrados en tus platos</p>
+              <p className="text-gray-600 mb-4">{t('costAnalysis.noIngredients')}</p>
             </div>
           ) : (
             <Table>
@@ -330,6 +332,11 @@ const IngredientCostAnalysis: React.FC = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Add Savings Dashboard */}
+      {totalMonthlySavings > 0 && (
+        <SavingsDashboard totalMonthlySavings={totalMonthlySavings} />
+      )}
     </div>
   );
 };

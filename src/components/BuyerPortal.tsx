@@ -7,13 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Package, Truck, Star } from "lucide-react";
+import { Search, Package, Truck, Star, ShoppingCart as CartIcon } from "lucide-react";
 import { Product } from '../types/Product';
 import { useUser } from '../contexts/UserContext';
 import { useTranslation } from '../contexts/LanguageContext';
+import { useShoppingCart } from '../contexts/ShoppingCartContext';
 import MenuManagement from './MenuManagement';
 import ProductTable from './ProductTable';
 import IngredientCostAnalysis from './IngredientCostAnalysis';
+import SupplierProfile from './SupplierProfile';
+import ShoppingCart from './ShoppingCart';
 
 interface BuyerPortalProps {
   products: Product[];
@@ -21,11 +24,13 @@ interface BuyerPortalProps {
 
 const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
   const [activeTab, setActiveTab] = useState('catalog');
+  const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
   const { currentUser } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedQuality, setSelectedQuality] = useState('all');
   const { t } = useTranslation();
+  const { cartItems } = useShoppingCart();
 
   // Get unique categories and qualities for filters
   const categories = Array.from(new Set(products.map(p => p.category)));
@@ -42,11 +47,33 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
   });
 
   const handleSupplierClick = (supplierId: string) => {
-    // For future: Navigate to supplier profile or show supplier details
+    setSelectedSupplierId(supplierId);
+  };
+
+  const handleBackToCatalog = () => {
+    setSelectedSupplierId(null);
   };
 
   // Helper to switch tab to "analisis"
   const handleAnalysisTab = () => setActiveTab('analysis');
+
+  // Get supplier products for profile view
+  const supplierProducts = selectedSupplierId 
+    ? products.filter(p => p.supplierId === selectedSupplierId)
+    : [];
+
+  // If viewing supplier profile, show that instead
+  if (selectedSupplierId) {
+    return (
+      <div className="max-w-7xl mx-auto p-6">
+        <SupplierProfile
+          supplierId={selectedSupplierId}
+          products={supplierProducts}
+          onBack={handleBackToCatalog}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6">
@@ -56,10 +83,19 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
       </div>
 
       <Tabs value={activeTab} defaultValue="catalog" className="space-y-6" onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="catalog">{t('buyerPortal.tabs.catalog')}</TabsTrigger>
           <TabsTrigger value="menu">{t('buyerPortal.tabs.menu')}</TabsTrigger>
           <TabsTrigger value="analysis">{t('buyerPortal.tabs.costAnalysis')}</TabsTrigger>
+          <TabsTrigger value="cart" className="relative">
+            <CartIcon className="w-4 h-4 mr-2" />
+            {t('shoppingCart.title')}
+            {cartItems.length > 0 && (
+              <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs flex items-center justify-center">
+                {cartItems.length}
+              </Badge>
+            )}
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="catalog" className="space-y-6">
@@ -111,6 +147,10 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
 
         <TabsContent value="analysis" className="space-y-6">
           <IngredientCostAnalysis />
+        </TabsContent>
+
+        <TabsContent value="cart" className="space-y-6">
+          <ShoppingCart />
         </TabsContent>
       </Tabs>
     </div>

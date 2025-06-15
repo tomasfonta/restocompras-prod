@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Mail, Phone, MapPin, Clock, Package, Star } from "lucide-react";
 import { Product } from '../types/Product';
+import { useTranslation } from '../contexts/LanguageContext';
 
 interface SupplierProfileProps {
   supplierId: string;
@@ -12,6 +13,7 @@ interface SupplierProfileProps {
 }
 
 const SupplierProfile = ({ supplierId, products, onBack }: SupplierProfileProps) => {
+  const { t } = useTranslation();
   const supplierName = products[0]?.supplierName || 'Proveedor';
   const activeProducts = products.filter(p => p.inStock);
   const avgDelivery = products.length > 0 ? 
@@ -30,7 +32,7 @@ const SupplierProfile = ({ supplierId, products, onBack }: SupplierProfileProps)
           className="flex items-center space-x-2"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Volver al Catálogo</span>
+          <span>{t('supplier.backToCatalog')}</span>
         </Button>
       </div>
 
@@ -43,7 +45,7 @@ const SupplierProfile = ({ supplierId, products, onBack }: SupplierProfileProps)
                 <span className="text-white font-bold text-2xl">{supplierName.charAt(0)}</span>
               </div>
               <CardTitle className="text-2xl text-gray-900">{supplierName}</CardTitle>
-              <CardDescription className="text-gray-600">Proveedor Premium</CardDescription>
+              <CardDescription className="text-gray-600">{t('supplier.premiumSupplier')}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-3 text-gray-600">
@@ -60,7 +62,7 @@ const SupplierProfile = ({ supplierId, products, onBack }: SupplierProfileProps)
               </div>
               <div className="flex items-center space-x-3 text-gray-600">
                 <Clock className="w-4 h-4" />
-                <span className="text-sm">Tiempo promedio: {avgDelivery} días</span>
+                <span className="text-sm">{t('supplier.averageDelivery')}: {avgDelivery} {t('supplier.days')}</span>
               </div>
             </CardContent>
           </Card>
@@ -68,23 +70,23 @@ const SupplierProfile = ({ supplierId, products, onBack }: SupplierProfileProps)
           {/* Quick Stats */}
           <Card className="mt-6">
             <CardHeader>
-              <CardTitle className="text-lg">Estadísticas</CardTitle>
+              <CardTitle className="text-lg">{t('supplier.statistics')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Productos Activos</span>
+                <span className="text-gray-600">{t('supplier.activeProducts')}</span>
                 <Badge variant="secondary">{activeProducts.length}</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Categorías</span>
+                <span className="text-gray-600">{t('supplier.categories')}</span>
                 <Badge variant="secondary">{categories.size}</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Precio Promedio</span>
+                <span className="text-gray-600">{t('supplier.averagePrice')}</span>
                 <Badge variant="secondary">${avgPrice.toFixed(2)}</Badge>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-600">Calificación</span>
+                <span className="text-gray-600">{t('supplier.rating')}</span>
                 <div className="flex items-center space-x-1">
                   <Star className="w-4 h-4 text-yellow-500 fill-current" />
                   <span className="text-sm font-medium">4.8</span>
@@ -100,17 +102,17 @@ const SupplierProfile = ({ supplierId, products, onBack }: SupplierProfileProps)
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Package className="w-5 h-5 mr-2 text-amber-600" />
-                Productos Disponibles
+                {t('supplier.availableProducts')}
               </CardTitle>
               <CardDescription>
-                Explora todos los productos de {supplierName}
+                {t('supplier.exploreProducts')} {supplierName}
               </CardDescription>
             </CardHeader>
             <CardContent>
               {products.length === 0 ? (
                 <div className="text-center py-8">
                   <Package className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                  <p className="text-gray-500">Este proveedor no tiene productos disponibles</p>
+                  <p className="text-gray-500">{t('supplier.noProducts')}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -135,7 +137,7 @@ const SupplierProfile = ({ supplierId, products, onBack }: SupplierProfileProps)
                                 variant="outline" 
                                 className={`text-xs ${product.inStock ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}
                               >
-                                {product.inStock ? 'En Stock' : 'Agotado'}
+                                {product.inStock ? t('supplier.inStock') : t('supplier.outOfStock')}
                               </Badge>
                             </div>
                           </div>
@@ -152,7 +154,7 @@ const SupplierProfile = ({ supplierId, products, onBack }: SupplierProfileProps)
                           <div className="flex items-center justify-between text-sm text-gray-600">
                             <div className="flex items-center space-x-1">
                               <Clock className="w-3 h-3" />
-                              <span>{product.deliveryDays} días</span>
+                              <span>{product.deliveryDays} {t('supplier.days')}</span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <Star className="w-3 h-3" />
