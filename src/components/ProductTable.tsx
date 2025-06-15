@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,8 +32,8 @@ const ProductTable = ({ products, onEdit, onDelete, isSupplierView, onSupplierCl
   };
 
   const handleAddToCart = (product: Product) => {
-    // Add with default quantity of 1 (only two args, do not pass 3rd arg)
-    addToCart(product, 1);
+    // Add with default quantities when adding from catalog
+    addToCart(product, 1, 1);
   };
 
   const sortedProducts = [...products].sort((a, b) => {
