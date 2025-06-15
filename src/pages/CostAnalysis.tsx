@@ -60,11 +60,11 @@ const CostAnalysis = () => {
   
   const ingredientAnalysis = useMemo(() => {
     const ingredientMap = new Map();
-    
-    // Collect all ingredients from user's dishes
+
+    // 1. Agrupar ingredientes
     userDishes.forEach(dish => {
       dish.ingredients.forEach(ingredient => {
-        const key = ingredient.name.toLowerCase();
+        const key = ingredient.name.toLowerCase().trim();
         if (!ingredientMap.has(key)) {
           ingredientMap.set(key, {
             name: ingredient.name,
@@ -84,7 +84,6 @@ const CostAnalysis = () => {
             monthlyServings: dish.monthlyServings || 0
           });
           existing.totalMonthlyServings += dish.monthlyServings || 0;
-          // Use the higher cost if there's a difference
           if (ingredient.cost && ingredient.cost > existing.currentCost) {
             existing.currentCost = ingredient.cost;
           }
@@ -92,50 +91,56 @@ const CostAnalysis = () => {
       });
     });
 
-    // Find cheapest alternatives with unit conversion
+    // 2. Para cada ingrediente, buscar alternativas reales y calcular ahorros
     const analysis = Array.from(ingredientMap.values()).map(ingredient => {
-      // 1. Get ingredient cost per base unit
-      const { value: ingredientQtyInBase, baseUnit: ingredientBaseUnit } = getUnitInBase(
-          ingredient.quantity,
-          ingredient.unit
+      // Convertir ingrediente a unidad base
+      const { value: ingQtyInBase, baseUnit: ingBaseUnit } = getUnitInBase(
+        ingredient.quantity,
+        ingredient.unit
       );
 
-      if (ingredientQtyInBase === 0 || !ingredientBaseUnit || ingredient.currentCost === 0) {
-          return { 
-              ...ingredient, 
-              cheapestAlternative: null, 
-              potentialSavingsPerUnit: 0,
-              monthlySavings: 0, 
-              annualSavings: 0, 
-              savingsPercentage: 0 
-          };
+      if (ingQtyInBase === 0 || !ingBaseUnit || ingredient.currentCost === 0) {
+        return {
+          ...ingredient,
+          cheapestAlternative: null,
+          potentialSavingsPerUnit: 0,
+          monthlySavings: 0,
+          annualSavings: 0,
+          savingsPercentage: 0
+        };
       }
-      const ingredientCostPerBaseUnit = ingredient.currentCost / ingredientQtyInBase;
+      const ingredientCostPerBaseUnit = ingredient.currentCost / ingQtyInBase;
 
-      // 2. Search for similar products
-      const similarProducts = products.filter(
-          (product) =>
-          product.name.toLowerCase().includes(ingredient.name.toLowerCase()) ||
-          ingredient.name.toLowerCase().includes(product.name.toLowerCase().split(' ')[0])
-      );
+      // Filtrar productos similares por NOMBRE usando palabras comunes
+      const ingredientKeyword = ingredient.name.toLowerCase().split(' ')[0];
+      const similarProducts = products.filter(product => {
+        const productName = product.name.toLowerCase();
+        // Coincidencia exacta o parcial
+        return (
+          productName.includes(ingredient.name.toLowerCase()) ||
+          ingredient.name.toLowerCase().includes(productName.split(' ')[0]) ||
+          productName.includes(ingredientKeyword)
+        );
+      });
 
-      // 3. Find compatible alternatives and their cost per base unit
+      // Alternativas compatibles (misma unidad base)
       const compatibleAlternatives = similarProducts
-          .map((product) => {
-              const { value: productQtyInBase, baseUnit: productBaseUnit } = getUnitInBase(
-                  product.size,
-                  product.dimension
-              );
+        .map(product => {
+          const { value: productQtyInBase, baseUnit: productBaseUnit } = getUnitInBase(
+            product.size,
+            product.dimension
+          );
 
-              if (productQtyInBase > 0 && productBaseUnit === ingredientBaseUnit) {
-                  return {
-                      product,
-                      costPerBaseUnit: product.price / productQtyInBase,
-                  };
-              }
-              return null;
-          })
-          .filter((item): item is NonNullable<typeof item> => item !== null);
+          // Solo comparar si las bases coinciden (g, ml, unidad)
+          if (productQtyInBase > 0 && productBaseUnit === ingBaseUnit) {
+            return {
+              product,
+              costPerBaseUnit: product.price / productQtyInBase,
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
 
       let cheapestAlternative = null;
       let potentialSavingsPerUnit = 0;
@@ -144,39 +149,42 @@ const CostAnalysis = () => {
       let savingsPercentage = 0;
 
       if (compatibleAlternatives.length > 0) {
-          // 4. Find the cheapest alternative
-          const cheapest = compatibleAlternatives.reduce((min, current) =>
-              current.costPerBaseUnit < min.costPerBaseUnit ? current : min
-          );
+        // 3. Buscar la más barata
+        const cheapest = compatibleAlternatives.reduce((min, current) =>
+          current.costPerBaseUnit < min.costPerBaseUnit ? current : min
+        );
 
-          // 5. Calculate savings if alternative is cheaper
-          if (cheapest.costPerBaseUnit < ingredientCostPerBaseUnit) {
-              cheapestAlternative = cheapest.product;
-              const savingsPerBaseUnit = ingredientCostPerBaseUnit - cheapest.costPerBaseUnit;
+        // Solo si el alternativo ES MÁS BARATO
+        if (cheapest.costPerBaseUnit < ingredientCostPerBaseUnit) {
+          cheapestAlternative = cheapest.product;
+          const savingsPerBaseUnit = ingredientCostPerBaseUnit - cheapest.costPerBaseUnit;
+          // Ahorro potencial en la cantidad total del ingrediente (por porción/plato)
+          potentialSavingsPerUnit = savingsPerBaseUnit * ingQtyInBase;
 
-              potentialSavingsPerUnit = savingsPerBaseUnit * ingredientQtyInBase;
-
-              if (ingredient.totalMonthlyServings > 0) {
-                  monthlySavings = potentialSavingsPerUnit * ingredient.totalMonthlyServings;
-                  annualSavings = monthlySavings * 12;
-              }
-
-              if (ingredient.currentCost > 0) {
-                  savingsPercentage = (potentialSavingsPerUnit / ingredient.currentCost) * 100;
-              }
+          if (ingredient.totalMonthlyServings > 0) {
+            monthlySavings = potentialSavingsPerUnit * ingredient.totalMonthlyServings;
+            annualSavings = monthlySavings * 12;
           }
+          if (ingredient.currentCost > 0) {
+            // Ahorro relativo respecto del costo original
+            // Ejemplo: ((3/50g)-(4/100g)) * 50 = ahorro monetario POR PLATO
+            // El % es por porción, respecto al precio original
+            savingsPercentage = (savingsPerBaseUnit / ingredientCostPerBaseUnit) * 100;
+          }
+        }
       }
 
       return {
-          ...ingredient,
-          cheapestAlternative,
-          potentialSavingsPerUnit,
-          monthlySavings,
-          annualSavings,
-          savingsPercentage,
+        ...ingredient,
+        cheapestAlternative,
+        potentialSavingsPerUnit,
+        monthlySavings,
+        annualSavings,
+        savingsPercentage,
       };
     });
 
+    // Ordenar por mayor ahorro mensual
     return analysis.sort((a, b) => b.monthlySavings - a.monthlySavings);
   }, [userDishes, products]);
 

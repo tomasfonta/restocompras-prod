@@ -19,7 +19,7 @@ interface DataContextType {
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
-// Generate sample products for current supplier (user-2) - Adding cheese product
+// Generate sample products for current supplier (user-2) - Adding cheese and bacon products
 const generateCurrentSupplierProducts = (): Product[] => {
   const products: Product[] = [];
   const validDimensions = DIMENSIONS.map(d => d.name);
@@ -41,16 +41,11 @@ const generateCurrentSupplierProducts = (): Product[] => {
     { name: 'Papa', category: 'Verduras', dimension: 'kg', size: 2 }
   ];
 
-  for (let i = 0; i < 11; i++) { // Increased to 11 to include cheese
+  for (let i = 0; i < 11; i++) {
     const template = productTemplates[i];
     const brand = brands[i % brands.length];
-    
-    // Special pricing for the cheese product
     let price = Math.round((Math.random() * 100 + 20) * 100) / 100;
-    if (template.name === 'Queso') {
-      price = 5.00; // 5 euros for 100g as requested
-    }
-    
+    if (template.name === 'Queso') price = 5.00; // cheese fixed
     products.push({
       id: `current-${i + 1}`,
       name: `${template.name} ${brand}`,
@@ -67,6 +62,24 @@ const generateCurrentSupplierProducts = (): Product[] => {
       lastUpdated: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
     });
   }
+
+  // Añadir producto 'Bacon' de proveedor por 100g a $4
+  products.push({
+    id: `current-bacon-1`,
+    name: 'Bacon Premium',
+    size: 100,
+    dimension: 'g',
+    brand: 'Master Pork',
+    price: 4.00,
+    category: 'Fiambres',
+    quality: 'Alta',
+    deliveryDays: 2,
+    supplierId: 'supplier-9',
+    supplierName: 'Comercializadora Norte',
+    inStock: true,
+    lastUpdated: new Date().toISOString(),
+  });
+
   return products;
 };
 
