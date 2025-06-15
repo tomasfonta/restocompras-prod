@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,47 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { useUser } from '../contexts/UserContext';
 import { useData } from '../contexts/DataContext';
 import Header from '../components/Header';
+
+const conversionFactors: { [key: string]: { baseUnit: string; factor: number } } = {
+  // Weight -> base: 'g'
+  g: { baseUnit: 'g', factor: 1 },
+  gramo: { baseUnit: 'g', factor: 1 },
+  gramos: { baseUnit: 'g', factor: 1 },
+  kg: { baseUnit: 'g', factor: 1000 },
+  kilogramo: { baseUnit: 'g', factor: 1000 },
+  kilogramos: { baseUnit: 'g', factor: 1000 },
+
+  // Volume -> base: 'ml'
+  ml: { baseUnit: 'ml', factor: 1 },
+  "ml.": { baseUnit: "ml", factor: 1 },
+  mililitro: { baseUnit: 'ml', factor: 1 },
+  mililitros: { baseUnit: 'ml', factor: 1 },
+  l: { baseUnit: 'ml', factor: 1000 },
+  "l.": { baseUnit: "ml", factor: 1000 },
+  litro: { baseUnit: 'ml', factor: 1000 },
+  litros: { baseUnit: 'ml', factor: 1000 },
+
+  // Count -> base: 'unidad'
+  c: { baseUnit: 'unidad', factor: 1 },
+  unit: { baseUnit: 'unidad', factor: 1 },
+  units: { baseUnit: 'unidad', factor: 1 },
+  unidad: { baseUnit: 'unidad', factor: 1 },
+  unidades: { baseUnit: 'unidad', factor: 1 },
+};
+
+const getUnitInBase = (quantity: number, unit: string | undefined) => {
+  if (!unit) return { value: quantity, baseUnit: 'unidad' };
+  const unitLower = unit.toLowerCase().trim();
+  const conversion = conversionFactors[unitLower];
+  if (conversion) {
+    return {
+      value: quantity * conversion.factor,
+      baseUnit: conversion.baseUnit,
+    };
+  }
+  // If no conversion is found, treat it as a discrete unit
+  return { value: quantity, baseUnit: unitLower };
+};
 
 const CostAnalysis = () => {
   const navigate = useNavigate();
@@ -52,49 +92,88 @@ const CostAnalysis = () => {
       });
     });
 
-    // Find cheapest alternatives from supplier products
+    // Find cheapest alternatives with unit conversion
     const analysis = Array.from(ingredientMap.values()).map(ingredient => {
-      // Search for similar products in the supplier database
-      const similarProducts = products.filter(product => 
-        product.name.toLowerCase().includes(ingredient.name.toLowerCase()) ||
-        ingredient.name.toLowerCase().includes(product.name.toLowerCase().split(' ')[0])
+      // 1. Get ingredient cost per base unit
+      const { value: ingredientQtyInBase, baseUnit: ingredientBaseUnit } = getUnitInBase(
+          ingredient.quantity,
+          ingredient.unit
       );
+
+      if (ingredientQtyInBase === 0 || !ingredientBaseUnit || ingredient.currentCost === 0) {
+          return { 
+              ...ingredient, 
+              cheapestAlternative: null, 
+              potentialSavingsPerUnit: 0,
+              monthlySavings: 0, 
+              annualSavings: 0, 
+              savingsPercentage: 0 
+          };
+      }
+      const ingredientCostPerBaseUnit = ingredient.currentCost / ingredientQtyInBase;
+
+      // 2. Search for similar products
+      const similarProducts = products.filter(
+          (product) =>
+          product.name.toLowerCase().includes(ingredient.name.toLowerCase()) ||
+          ingredient.name.toLowerCase().includes(product.name.toLowerCase().split(' ')[0])
+      );
+
+      // 3. Find compatible alternatives and their cost per base unit
+      const compatibleAlternatives = similarProducts
+          .map((product) => {
+              const { value: productQtyInBase, baseUnit: productBaseUnit } = getUnitInBase(
+                  product.size,
+                  product.dimension
+              );
+
+              if (productQtyInBase > 0 && productBaseUnit === ingredientBaseUnit) {
+                  return {
+                      product,
+                      costPerBaseUnit: product.price / productQtyInBase,
+                  };
+              }
+              return null;
+          })
+          .filter((item): item is NonNullable<typeof item> => item !== null);
 
       let cheapestAlternative = null;
       let potentialSavingsPerUnit = 0;
       let monthlySavings = 0;
       let annualSavings = 0;
+      let savingsPercentage = 0;
 
-      if (similarProducts.length > 0) {
-        // Find the cheapest alternative
-        cheapestAlternative = similarProducts.reduce((cheapest, current) => 
-          current.price < cheapest.price ? current : cheapest
-        );
+      if (compatibleAlternatives.length > 0) {
+          // 4. Find the cheapest alternative
+          const cheapest = compatibleAlternatives.reduce((min, current) =>
+              current.costPerBaseUnit < min.costPerBaseUnit ? current : min
+          );
 
-        // Calculate potential savings (simplified calculation)
-        const alternativeCostPerUnit = cheapestAlternative.price / cheapestAlternative.size;
-        const currentCostPerUnit = ingredient.currentCost / ingredient.quantity;
-        
-        if (alternativeCostPerUnit < currentCostPerUnit) {
-          potentialSavingsPerUnit = (currentCostPerUnit - alternativeCostPerUnit) * ingredient.quantity;
-          
-          // Calculate monthly and annual savings based on servings
-          if (ingredient.totalMonthlyServings > 0) {
-            monthlySavings = potentialSavingsPerUnit * ingredient.totalMonthlyServings;
-            annualSavings = monthlySavings * 12;
+          // 5. Calculate savings if alternative is cheaper
+          if (cheapest.costPerBaseUnit < ingredientCostPerBaseUnit) {
+              cheapestAlternative = cheapest.product;
+              const savingsPerBaseUnit = ingredientCostPerBaseUnit - cheapest.costPerBaseUnit;
+
+              potentialSavingsPerUnit = savingsPerBaseUnit * ingredientQtyInBase;
+
+              if (ingredient.totalMonthlyServings > 0) {
+                  monthlySavings = potentialSavingsPerUnit * ingredient.totalMonthlyServings;
+                  annualSavings = monthlySavings * 12;
+              }
+
+              if (ingredient.currentCost > 0) {
+                  savingsPercentage = (potentialSavingsPerUnit / ingredient.currentCost) * 100;
+              }
           }
-        }
       }
 
       return {
-        ...ingredient,
-        cheapestAlternative,
-        potentialSavingsPerUnit,
-        monthlySavings,
-        annualSavings,
-        savingsPercentage: ingredient.currentCost > 0 && potentialSavingsPerUnit > 0 
-          ? (potentialSavingsPerUnit / ingredient.currentCost) * 100 
-          : 0
+          ...ingredient,
+          cheapestAlternative,
+          potentialSavingsPerUnit,
+          monthlySavings,
+          annualSavings,
+          savingsPercentage,
       };
     });
 
