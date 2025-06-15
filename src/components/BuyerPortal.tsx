@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -17,6 +16,7 @@ import ProductTable from './ProductTable';
 import IngredientCostAnalysis from './IngredientCostAnalysis';
 import SupplierProfile from './SupplierProfile';
 import ShoppingCart from './ShoppingCart';
+import { Dish } from '../types/Dish';
 
 interface BuyerPortalProps {
   products: Product[];
@@ -25,6 +25,7 @@ interface BuyerPortalProps {
 const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
   const [activeTab, setActiveTab] = useState('catalog');
   const [selectedSupplierId, setSelectedSupplierId] = useState<string | null>(null);
+  const [dishes, setDishes] = useState<Dish[]>([]); // If menu data will be fetched, replace with real data loading
   const { currentUser } = useUser();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -146,7 +147,7 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
         </TabsContent>
 
         <TabsContent value="analysis" className="space-y-6">
-          <IngredientCostAnalysis />
+          <IngredientCostAnalysis dishes={dishes} products={products} />
         </TabsContent>
 
         <TabsContent value="cart" className="space-y-6">

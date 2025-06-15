@@ -7,7 +7,7 @@ import { TrendingDown, TrendingUp, ShoppingCart } from "lucide-react";
 import { Product } from '../types/Product';
 import { Dish } from '../types/Dish';
 import { useShoppingCart } from '../contexts/ShoppingCartContext';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../contexts/LanguageContext';
 
 interface IngredientCostAnalysisProps {
   dishes: Dish[];
@@ -23,9 +23,9 @@ interface CostAnalysis {
   monthlyQuantityNeeded: number;
 }
 
-const IngredientCostAnalysis = ({ dishes, products }: IngredientCostAnalysisProps) => {
+const IngredientCostAnalysis = ({ dishes, products }: { dishes: Dish[]; products: Product[] }) => {
   const { addToCart } = useShoppingCart();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   const calculateCostAnalysis = (): CostAnalysis[] => {
     const analysisMap = new Map<string, {
