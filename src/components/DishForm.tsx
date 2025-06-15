@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Plus, Trash2 } from "lucide-react";
+import { Table, TableHeader, TableBody, TableRow, TableCell, TableHead } from "@/components/ui/table";
 import { Dish, Ingredient } from '../types/Dish';
 import { useUser } from '../contexts/UserContext';
 
@@ -152,83 +153,124 @@ const DishForm: React.FC<DishFormProps> = ({ dish, onSave, onCancel }) => {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Ingredientes</h3>
             
-            {/* Add New Ingredient */}
+            {/* Add New Ingredient - Now with Table+Header */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-sm">Agregar Ingrediente</CardTitle>
+                <CardTitle className="text-sm mb-2">Agregar Ingrediente</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-                  <Input
-                    placeholder="Nombre"
-                    value={newIngredient.name}
-                    onChange={(e) => setNewIngredient({...newIngredient, name: e.target.value})}
-                  />
-                  <Input
-                    type="number"
-                    placeholder="Cantidad"
-                    value={newIngredient.quantity}
-                    onChange={(e) => setNewIngredient({...newIngredient, quantity: parseFloat(e.target.value)})}
-                  />
-                  <Input
-                    placeholder="Unidad"
-                    value={newIngredient.unit}
-                    onChange={(e) => setNewIngredient({...newIngredient, unit: e.target.value})}
-                  />
-                  <Input
-                    type="number"
-                    step="0.01"
-                    placeholder="Costo"
-                    value={newIngredient.cost}
-                    onChange={(e) => setNewIngredient({...newIngredient, cost: parseFloat(e.target.value)})}
-                  />
-                </div>
-                <Button type="button" onClick={addIngredient} size="sm">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Agregar
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Ingredients List */}
-            {ingredients.length > 0 && (
-              <div className="space-y-2">
-                <h4 className="font-medium">Lista de Ingredientes</h4>
-                {ingredients.map((ingredient) => (
-                  <Card key={ingredient.id}>
-                    <CardContent className="py-3">
-                      <div className="grid grid-cols-1 md:grid-cols-5 gap-2 items-center">
+              <CardContent className="space-y-3 p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nombre</TableHead>
+                      <TableHead>Cantidad</TableHead>
+                      <TableHead>Unidad</TableHead>
+                      <TableHead>Costo</TableHead>
+                      <TableHead></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>
                         <Input
-                          value={ingredient.name}
-                          onChange={(e) => updateIngredient(ingredient.id, 'name', e.target.value)}
+                          placeholder="Nombre"
+                          value={newIngredient.name}
+                          onChange={(e) => setNewIngredient({ ...newIngredient, name: e.target.value })}
                         />
+                      </TableCell>
+                      <TableCell>
                         <Input
                           type="number"
-                          value={ingredient.quantity}
-                          onChange={(e) => updateIngredient(ingredient.id, 'quantity', parseFloat(e.target.value))}
+                          placeholder="Cantidad"
+                          value={newIngredient.quantity}
+                          onChange={(e) => setNewIngredient({ ...newIngredient, quantity: parseFloat(e.target.value) })}
                         />
+                      </TableCell>
+                      <TableCell>
                         <Input
-                          value={ingredient.unit}
-                          onChange={(e) => updateIngredient(ingredient.id, 'unit', e.target.value)}
+                          placeholder="Unidad"
+                          value={newIngredient.unit}
+                          onChange={(e) => setNewIngredient({ ...newIngredient, unit: e.target.value })}
                         />
+                      </TableCell>
+                      <TableCell>
                         <Input
                           type="number"
                           step="0.01"
-                          value={ingredient.cost || 0}
-                          onChange={(e) => updateIngredient(ingredient.id, 'cost', parseFloat(e.target.value))}
+                          placeholder="Costo"
+                          value={newIngredient.cost}
+                          onChange={(e) => setNewIngredient({ ...newIngredient, cost: parseFloat(e.target.value) })}
                         />
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => removeIngredient(ingredient.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
+                      </TableCell>
+                      <TableCell>
+                        <Button type="button" onClick={addIngredient} size="sm">
+                          <Plus className="w-4 h-4" />
                         </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
+            {/* Ingredients List - Now with Table+Header */}
+            {ingredients.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-medium">Lista de Ingredientes</h4>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nombre</TableHead>
+                      <TableHead>Cantidad</TableHead>
+                      <TableHead>Unidad</TableHead>
+                      <TableHead>Costo</TableHead>
+                      <TableHead>Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {ingredients.map((ingredient) => (
+                      <TableRow key={ingredient.id}>
+                        <TableCell>
+                          <Input
+                            value={ingredient.name}
+                            onChange={(e) => updateIngredient(ingredient.id, 'name', e.target.value)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={ingredient.quantity}
+                            onChange={(e) => updateIngredient(ingredient.id, 'quantity', parseFloat(e.target.value))}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            value={ingredient.unit}
+                            onChange={(e) => updateIngredient(ingredient.id, 'unit', e.target.value)}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={ingredient.cost || 0}
+                            onChange={(e) => updateIngredient(ingredient.id, 'cost', parseFloat(e.target.value))}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => removeIngredient(ingredient.id)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
               </div>
             )}
           </div>
@@ -248,3 +290,4 @@ const DishForm: React.FC<DishFormProps> = ({ dish, onSave, onCancel }) => {
 };
 
 export default DishForm;
+
