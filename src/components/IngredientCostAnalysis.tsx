@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,131 +18,200 @@ interface IngredientCostAnalysisProps {
 }
 
 interface IngredientUsage {
-  productId: string;
-  productName: string;
+  name: string;
   productImage: string;
-  brand: string;
-  totalUsed: number;
-  dimension: string;
-  averagePrice: number;
-  totalCost: number;
-  usedInDishes: string[];
+  currentCost: number;
+  quantity: number;
+  unit: string;
+  dishes: Array<{
+    name: string;
+    monthlyServings: number;
+  }>;
+  totalMonthlyServings: number;
+  cheapestAlternative: Product | null;
+  potentialSavingsPerUnit: number;
+  monthlySavings: number;
+  annualSavings: number;
+  savingsPercentage: number;
 }
 
-interface CostOptimization {
-  productName: string;
-  currentSupplier: string;
-  currentPrice: number;
-  bestAlternative: {
-    supplier: string;
-    price: number;
-    savings: number;
-    savingsPercentage: number;
-  };
-}
+const conversionFactors: { [key: string]: { baseUnit: string; factor: number } } = {
+  // Weight -> base: 'g'
+  g: { baseUnit: 'g', factor: 1 },
+  gramo: { baseUnit: 'g', factor: 1 },
+  gramos: { baseUnit: 'g', factor: 1 },
+  kg: { baseUnit: 'g', factor: 1000 },
+  kilogramo: { baseUnit: 'g', factor: 1000 },
+  kilogramos: { baseUnit: 'g', factor: 1000 },
 
-const getUniqueProducts = (products: Product[]): Product[] => {
-  if (!products || !Array.isArray(products)) {
-    return [];
+  // Volume -> base: 'ml'
+  ml: { baseUnit: 'ml', factor: 1 },
+  "ml.": { baseUnit: "ml", factor: 1 },
+  mililitro: { baseUnit: 'ml', factor: 1 },
+  mililitros: { baseUnit: 'ml', factor: 1 },
+  l: { baseUnit: 'ml', factor: 1000 },
+  "l.": { baseUnit: "ml", factor: 1000 },
+  litro: { baseUnit: 'ml', factor: 1000 },
+  litros: { baseUnit: 'ml', factor: 1000 },
+  L: { baseUnit: 'ml', factor: 1000 },
+
+  // Count -> base: 'unidad'
+  c: { baseUnit: 'unidad', factor: 1 },
+  C: { baseUnit: 'unidad', factor: 1 },
+  unit: { baseUnit: 'unidad', factor: 1 },
+  units: { baseUnit: 'unidad', factor: 1 },
+  unidad: { baseUnit: 'unidad', factor: 1 },
+  unidades: { baseUnit: 'unidad', factor: 1 },
+};
+
+const getUnitInBase = (quantity: number, unit: string | undefined) => {
+  if (!unit) return { value: quantity, baseUnit: 'unidad' };
+  const unitLower = unit.toLowerCase().trim();
+  const conversion = conversionFactors[unitLower];
+  if (conversion) {
+    return {
+      value: quantity * conversion.factor,
+      baseUnit: conversion.baseUnit,
+    };
   }
-  
-  const uniqueMap = new Map();
-  products.forEach(product => {
-    const key = `${product.name}-${product.brand}`;
-    if (!uniqueMap.has(key) || uniqueMap.get(key).price > product.price) {
-      uniqueMap.set(key, product);
-    }
-  });
-  return Array.from(uniqueMap.values());
+  return { value: quantity, baseUnit: unitLower };
 };
 
 const IngredientCostAnalysis = ({ products = [], dishes = [] }: IngredientCostAnalysisProps) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   
-  const uniqueProducts = useMemo(() => getUniqueProducts(products), [products]);
-  
-  const ingredientUsage = useMemo((): IngredientUsage[] => {
-    const usageMap = new Map<string, IngredientUsage>();
-    
+  const ingredientAnalysis = useMemo((): IngredientUsage[] => {
+    const ingredientMap = new Map();
+
+    // Agrupar ingredientes por nombre
     dishes.forEach(dish => {
       dish.ingredients?.forEach(ingredient => {
-        const product = uniqueProducts.find(p => p.id === ingredient.productId);
-        if (product) {
-          const key = `${product.name}-${product.brand}`;
-          const existing = usageMap.get(key);
-          
-          if (existing) {
-            existing.totalUsed += ingredient.quantity;
-            existing.totalCost += ingredient.quantity * product.price;
-            if (!existing.usedInDishes.includes(dish.name)) {
-              existing.usedInDishes.push(dish.name);
-            }
-          } else {
-            usageMap.set(key, {
-              productId: product.id,
-              productName: product.name,
-              productImage: getProductImage(product),
-              brand: product.brand,
-              totalUsed: ingredient.quantity,
-              dimension: product.dimension,
-              averagePrice: product.price,
-              totalCost: ingredient.quantity * product.price,
-              usedInDishes: [dish.name]
-            });
+        const key = ingredient.name.toLowerCase().trim();
+        if (!ingredientMap.has(key)) {
+          ingredientMap.set(key, {
+            name: ingredient.name,
+            currentCost: ingredient.cost || 0,
+            quantity: ingredient.quantity,
+            unit: ingredient.unit,
+            dishes: [{
+              name: dish.name,
+              monthlyServings: dish.monthlyServings || 1
+            }],
+            totalMonthlyServings: dish.monthlyServings || 1
+          });
+        } else {
+          const existing = ingredientMap.get(key);
+          existing.dishes.push({
+            name: dish.name,
+            monthlyServings: dish.monthlyServings || 1
+          });
+          existing.totalMonthlyServings += dish.monthlyServings || 1;
+          if (ingredient.cost && ingredient.cost > existing.currentCost) {
+            existing.currentCost = ingredient.cost;
           }
         }
       });
     });
-    
-    return Array.from(usageMap.values()).sort((a, b) => b.totalCost - a.totalCost);
-  }, [uniqueProducts, dishes]);
 
-  const costOptimizations = useMemo((): CostOptimization[] => {
-    const optimizations: CostOptimization[] = [];
-    
-    ingredientUsage.forEach(usage => {
-      const alternatives = products.filter(p => 
-        p.name === usage.productName && 
-        p.brand !== usage.brand &&
-        p.price < usage.averagePrice
+    // Analizar cada ingrediente para encontrar alternativas más baratas
+    const analysis = Array.from(ingredientMap.values()).map(ingredient => {
+      // Convertir ingrediente a unidad base
+      const { value: ingQtyInBase, baseUnit: ingBaseUnit } = getUnitInBase(
+        ingredient.quantity,
+        ingredient.unit
       );
-      
-      if (alternatives.length > 0) {
-        const bestAlternative = alternatives.reduce((best, current) => 
-          current.price < best.price ? current : best
-        );
-        
-        const savings = usage.averagePrice - bestAlternative.price;
-        const savingsPercentage = (savings / usage.averagePrice) * 100;
-        
-        optimizations.push({
-          productName: usage.productName,
-          currentSupplier: usage.brand,
-          currentPrice: usage.averagePrice,
-          bestAlternative: {
-            supplier: bestAlternative.brand,
-            price: bestAlternative.price,
-            savings,
-            savingsPercentage
-          }
-        });
+
+      if (ingQtyInBase === 0 || !ingBaseUnit || ingredient.currentCost === 0) {
+        return {
+          ...ingredient,
+          productImage: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=400&fit=crop',
+          cheapestAlternative: null,
+          potentialSavingsPerUnit: 0,
+          monthlySavings: 0,
+          annualSavings: 0,
+          savingsPercentage: 0
+        };
       }
+
+      const ingredientCostPerBaseUnit = ingredient.currentCost / ingQtyInBase;
+
+      // Buscar productos compatibles
+      const ingredientKeyword = ingredient.name.toLowerCase().split(' ')[0];
+      const similarProducts = products.filter(product => {
+        const productName = product.name.toLowerCase();
+        return (
+          productName.includes(ingredient.name.toLowerCase()) ||
+          ingredient.name.toLowerCase().includes(productName.split(' ')[0]) ||
+          productName.includes(ingredientKeyword)
+        );
+      });
+
+      // Filtrar productos con unidad base compatible
+      const compatibleAlternatives = similarProducts
+        .map(product => {
+          const { value: productQtyInBase, baseUnit: productBaseUnit } = getUnitInBase(
+            product.size,
+            product.dimension
+          );
+          if (productQtyInBase > 0 && productBaseUnit === ingBaseUnit) {
+            return {
+              product,
+              costPerBaseUnit: product.price / productQtyInBase,
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
+
+      let cheapestAlternative = null;
+      let potentialSavingsPerUnit = 0;
+      let monthlySavings = 0;
+      let annualSavings = 0;
+      let savingsPercentage = 0;
+
+      if (compatibleAlternatives.length > 0) {
+        const cheapest = compatibleAlternatives.reduce((min, current) =>
+          current.costPerBaseUnit < min.costPerBaseUnit ? current : min
+        );
+
+        // Solo si es más barato
+        if (cheapest.costPerBaseUnit < ingredientCostPerBaseUnit) {
+          cheapestAlternative = cheapest.product;
+          const savingsPerBaseUnit = ingredientCostPerBaseUnit - cheapest.costPerBaseUnit;
+          potentialSavingsPerUnit = savingsPerBaseUnit * ingQtyInBase;
+
+          if (ingredient.totalMonthlyServings > 0) {
+            monthlySavings = potentialSavingsPerUnit * ingredient.totalMonthlyServings;
+            annualSavings = monthlySavings * 12;
+          }
+          if (ingredient.currentCost > 0) {
+            savingsPercentage = (savingsPerBaseUnit / ingredientCostPerBaseUnit) * 100;
+          }
+        }
+      }
+
+      return {
+        ...ingredient,
+        productImage: getProductImage({ name: ingredient.name } as Product),
+        cheapestAlternative,
+        potentialSavingsPerUnit,
+        monthlySavings,
+        annualSavings,
+        savingsPercentage,
+      };
     });
-    
-    return optimizations.sort((a, b) => b.bestAlternative.savings - a.bestAlternative.savings);
-  }, [ingredientUsage, products]);
 
-  const totalMonthlyCost = ingredientUsage.reduce((sum, usage) => sum + usage.totalCost, 0);
-  const potentialSavings = costOptimizations.reduce((sum, opt) => sum + opt.bestAlternative.savings, 0);
+    return analysis.sort((a, b) => b.monthlySavings - a.monthlySavings);
+  }, [dishes, products]);
 
-  const filteredUsage = ingredientUsage.filter(usage => {
-    const matchesSearch = usage.productName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         usage.brand.toLowerCase().includes(searchTerm.toLowerCase());
+  const totalCurrentCost = ingredientAnalysis.reduce((sum, item) => sum + item.currentCost, 0);
+  const totalMonthlySavings = ingredientAnalysis.reduce((sum, item) => sum + item.monthlySavings, 0);
+  const totalAnnualSavings = ingredientAnalysis.reduce((sum, item) => sum + item.annualSavings, 0);
+
+  const filteredUsage = ingredientAnalysis.filter(usage => {
+    const matchesSearch = usage.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
-
-  const categories = Array.from(new Set(products.map(p => p.category))).filter(Boolean);
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
@@ -160,9 +230,9 @@ const IngredientCostAnalysis = ({ products = [], dishes = [] }: IngredientCostAn
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Costo Total Mensual</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Costo Total Actual</p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  ${totalMonthlyCost.toFixed(2)}
+                  ${totalCurrentCost.toFixed(2)}
                 </p>
               </div>
               <Calculator className="w-8 h-8 text-blue-600" />
@@ -174,9 +244,9 @@ const IngredientCostAnalysis = ({ products = [], dishes = [] }: IngredientCostAn
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Ahorro Potencial</p>
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Ahorro Mensual</p>
                 <p className="text-2xl font-bold text-green-600">
-                  ${potentialSavings.toFixed(2)}
+                  ${totalMonthlySavings.toFixed(2)}
                 </p>
               </div>
               <TrendingDown className="w-8 h-8 text-green-600" />
@@ -188,165 +258,142 @@ const IngredientCostAnalysis = ({ products = [], dishes = [] }: IngredientCostAn
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Productos Analizados</p>
-                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                  {ingredientUsage.length}
+                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Ahorro Anual</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  ${totalAnnualSavings.toFixed(2)}
                 </p>
               </div>
-              <AlertTriangle className="w-8 h-8 text-amber-600" />
+              <TrendingUp className="w-8 h-8 text-blue-600" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="usage" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="usage">Uso de Ingredientes</TabsTrigger>
-          <TabsTrigger value="optimization">Optimización de Costos</TabsTrigger>
-        </TabsList>
+      {/* Search */}
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Input
+            type="text"
+            placeholder="Buscar ingredientes..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+      </div>
 
-        <TabsContent value="usage" className="space-y-6">
-          {/* Search and Filter */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                type="text"
-                placeholder="Buscar ingredientes..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-          </div>
-
-          {/* Usage Table */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Uso de Ingredientes por Plato</CardTitle>
-              <CardDescription>
-                Análisis detallado del consumo y costo de cada ingrediente
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b border-gray-200 dark:border-gray-700">
-                      <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Ingrediente</th>
-                      <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Cantidad Usada</th>
-                      <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Precio Promedio</th>
-                      <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Costo Total</th>
-                      <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Platos</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredUsage.map((usage, index) => (
-                      <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                        <td className="p-4">
-                          <div className="flex items-center space-x-3">
-                            <img 
-                              src={usage.productImage} 
-                              alt={usage.productName}
-                              className="w-10 h-10 object-cover rounded border border-gray-200 dark:border-gray-700"
-                              onError={(e) => {
-                                e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=400&fit=crop';
-                              }}
-                            />
-                            <div>
-                              <div className="font-medium text-gray-900 dark:text-gray-100">{usage.productName}</div>
-                              <div className="text-sm text-gray-600 dark:text-gray-400">{usage.brand}</div>
-                            </div>
+      {/* Analysis Table */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Análisis Detallado de Ingredientes</CardTitle>
+          <CardDescription>
+            Comparación de precios y oportunidades de ahorro
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Ingrediente</th>
+                  <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Cantidad</th>
+                  <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Costo Actual</th>
+                  <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Mejor Alternativa</th>
+                  <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Ahorro %</th>
+                  <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Ahorro Mensual</th>
+                  <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Ahorro Anual</th>
+                  <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Platos</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsage.map((usage, index) => (
+                  <tr key={index} className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <td className="p-4">
+                      <div className="flex items-center space-x-3">
+                        <img 
+                          src={usage.productImage} 
+                          alt={usage.name}
+                          className="w-10 h-10 object-cover rounded border border-gray-200 dark:border-gray-700"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&h=400&fit=crop';
+                          }}
+                        />
+                        <div>
+                          <div className="font-medium text-gray-900 dark:text-gray-100">{usage.name}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-4">
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {usage.quantity} {usage.unit}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        ${usage.currentCost.toFixed(2)}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      {usage.cheapestAlternative ? (
+                        <div>
+                          <div className="font-medium text-green-600">{usage.cheapestAlternative.name}</div>
+                          <div className="text-sm text-gray-500">
+                            ${usage.cheapestAlternative.price} / {usage.cheapestAlternative.size}{usage.cheapestAlternative.dimension}
                           </div>
-                        </td>
-                        <td className="p-4">
-                          <span className="font-medium text-gray-900 dark:text-gray-100">
-                            {usage.totalUsed} {usage.dimension}
-                          </span>
-                        </td>
-                        <td className="p-4">
-                          <span className="font-medium text-gray-900 dark:text-gray-100">
-                            ${usage.averagePrice.toFixed(2)}
-                          </span>
-                        </td>
-                        <td className="p-4">
-                          <span className="font-bold text-red-600 dark:text-red-400">
-                            ${usage.totalCost.toFixed(2)}
-                          </span>
-                        </td>
-                        <td className="p-4">
-                          <div className="flex flex-wrap gap-1">
-                            {usage.usedInDishes.slice(0, 3).map((dish, dishIndex) => (
-                              <Badge key={dishIndex} variant="outline" className="text-xs">
-                                {dish}
-                              </Badge>
-                            ))}
-                            {usage.usedInDishes.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{usage.usedInDishes.length - 3} más
-                              </Badge>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="optimization" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
-                Oportunidades de Ahorro
-              </CardTitle>
-              <CardDescription>
-                Compara precios entre proveedores para optimizar costos
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {costOptimizations.length === 0 ? (
-                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                  <TrendingUp className="w-16 h-16 mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                  <p>No se encontraron oportunidades de ahorro</p>
-                  <p className="text-sm">Ya estás usando los mejores precios disponibles</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {costOptimizations.map((opt, index) => (
-                    <div key={index} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-gray-900 dark:text-gray-100">{opt.productName}</h3>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">No encontrado</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      {usage.savingsPercentage > 0 ? (
                         <Badge className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">
-                          Ahorro: ${opt.bestAlternative.savings.toFixed(2)} ({opt.bestAlternative.savingsPercentage.toFixed(1)}%)
+                          {usage.savingsPercentage.toFixed(1)}%
                         </Badge>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <p className="text-gray-600 dark:text-gray-400">Proveedor actual:</p>
-                          <p className="font-medium text-gray-900 dark:text-gray-100">
-                            {opt.currentSupplier} - ${opt.currentPrice.toFixed(2)}
-                          </p>
+                      ) : (
+                        <span className="text-gray-400">-</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      {usage.monthlySavings > 0 ? (
+                        <div className="text-green-600 font-medium">
+                          ${usage.monthlySavings.toFixed(2)}
                         </div>
-                        <div>
-                          <p className="text-gray-600 dark:text-gray-400">Mejor alternativa:</p>
-                          <p className="font-medium text-green-600 dark:text-green-400">
-                            {opt.bestAlternative.supplier} - ${opt.bestAlternative.price.toFixed(2)}
-                          </p>
+                      ) : (
+                        <span className="text-gray-400">Sin ahorro</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      {usage.annualSavings > 0 ? (
+                        <div className="text-blue-600 font-medium">
+                          ${usage.annualSavings.toFixed(2)}
                         </div>
+                      ) : (
+                        <span className="text-gray-400">Sin ahorro</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      <div className="text-sm">
+                        {usage.dishes.slice(0, 2).map(dish => (
+                          <div key={dish.name}>
+                            {dish.name} ({dish.monthlyServings}/mes)
+                          </div>
+                        ))}
+                        {usage.dishes.length > 2 && (
+                          <span className="text-gray-500">
+                            +{usage.dishes.length - 2} más
+                          </span>
+                        )}
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
