@@ -7,10 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calculator, TrendingDown, TrendingUp, AlertTriangle, Search, Filter } from "lucide-react";
+import { Calculator, TrendingDown, TrendingUp, AlertTriangle, Search, Filter, ShoppingCart } from "lucide-react";
 import { Product } from '../types/Product';
 import { Dish } from '../types/Dish';
 import { getProductImage } from '../utils/productImages';
+import { useShoppingCart } from '../contexts/ShoppingCartContext';
+import { useToast } from '@/hooks/use-toast';
 
 interface IngredientCostAnalysisProps {
   products: Product[];
@@ -79,6 +81,8 @@ const getUnitInBase = (quantity: number, unit: string | undefined) => {
 
 const IngredientCostAnalysis = ({ products = [], dishes = [] }: IngredientCostAnalysisProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { addToCart } = useShoppingCart();
+  const { toast } = useToast();
   
   const ingredientAnalysis = useMemo((): IngredientUsage[] => {
     const ingredientMap = new Map();
@@ -174,20 +178,20 @@ const IngredientCostAnalysis = ({ products = [], dishes = [] }: IngredientCostAn
           current.costPerBaseUnit < min.costPerBaseUnit ? current : min
         );
 
-        // Solo si es más barato
-        if (cheapest.costPerBaseUnit < ingredientCostPerBaseUnit) {
-          cheapestAlternative = cheapest.product;
-          const savingsPerBaseUnit = ingredientCostPerBaseUnit - cheapest.costPerBaseUnit;
-          potentialSavingsPerUnit = savingsPerBaseUnit * ingQtyInBase;
+      // Solo si es más barato
+      if (cheapest.costPerBaseUnit < ingredientCostPerBaseUnit) {
+        cheapestAlternative = cheapest.product;
+        const savingsPerBaseUnit = ingredientCostPerBaseUnit - cheapest.costPerBaseUnit;
+        potentialSavingsPerUnit = savingsPerBaseUnit * ingQtyInBase;
 
-          if (ingredient.totalMonthlyServings > 0) {
-            monthlySavings = potentialSavingsPerUnit * ingredient.totalMonthlyServings;
-            annualSavings = monthlySavings * 12;
-          }
-          if (ingredient.currentCost > 0) {
-            savingsPercentage = (savingsPerBaseUnit / ingredientCostPerBaseUnit) * 100;
-          }
+        if (ingredient.totalMonthlyServings > 0) {
+          monthlySavings = potentialSavingsPerUnit * ingredient.totalMonthlyServings;
+          annualSavings = monthlySavings * 12;
         }
+        if (ingredient.currentCost > 0) {
+          savingsPercentage = (savingsPerBaseUnit / ingredientCostPerBaseUnit) * 100;
+        }
+      }
       }
 
       return {
@@ -212,6 +216,14 @@ const IngredientCostAnalysis = ({ products = [], dishes = [] }: IngredientCostAn
     const matchesSearch = usage.name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
+
+  const handleAddToCart = (product: Product, ingredientName: string) => {
+    addToCart(product, 1);
+    toast({
+      title: "Producto agregado al carrito",
+      description: `${product.name} se agregó como alternativa para ${ingredientName}`,
+    });
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-8">
@@ -304,6 +316,7 @@ const IngredientCostAnalysis = ({ products = [], dishes = [] }: IngredientCostAn
                   <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Ahorro Mensual</th>
                   <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Ahorro Anual</th>
                   <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Platos</th>
+                  <th className="text-left p-4 font-semibold text-gray-900 dark:text-gray-100">Acción</th>
                 </tr>
               </thead>
               <tbody>
@@ -386,6 +399,20 @@ const IngredientCostAnalysis = ({ products = [], dishes = [] }: IngredientCostAn
                           </span>
                         )}
                       </div>
+                    </td>
+                    <td className="p-4">
+                      {usage.cheapestAlternative ? (
+                        <Button
+                          size="sm"
+                          onClick={() => handleAddToCart(usage.cheapestAlternative!, usage.name)}
+                          className="flex items-center gap-2"
+                        >
+                          <ShoppingCart className="w-4 h-4" />
+                          Agregar al Carro
+                        </Button>
+                      ) : (
+                        <span className="text-gray-400 text-sm">No disponible</span>
+                      )}
                     </td>
                   </tr>
                 ))}
