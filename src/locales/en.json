@@ -1,4 +1,3 @@
-
 {
   "header.supplier": "Supplier",
   "header.restaurant": "Restaurant",
@@ -28,6 +27,10 @@
   "login.demoUsers": "Demo Users",
   "login.demoRestaurant": "Restaurant",
   "login.demoSupplier": "Supplier",
+  "login.submitRestaurantBtn": "Log In as Restaurant",
+  "login.submitSupplierBtn": "Log In as Supplier",
+  "login.demoCallout.title": "Demo Mode",
+  "login.demoCallout.description": "Use your email to log in as a demo user",
   "toast.loginSuccess.title": "Login successful",
   "toast.loginSuccess.description": "Welcome back",
   "toast.loginError.title": "Authentication error",
@@ -72,5 +75,6 @@
   "shoppingCart.email": "Email",
   "shoppingCart.emptyCart": "Your shopping cart is empty",
   "shoppingCart.addProducts": "Add products from the catalog to start shopping",
-  "shoppingCart.printReport": "Print Report"
+  "shoppingCart.printReport": "Print Report",
+  "connector.or": "or"
 }

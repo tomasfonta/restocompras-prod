@@ -1,3 +1,4 @@
+import { UserType } from "@/contexts/UserContext";
 
 export interface User {
   id: string;
@@ -6,7 +7,7 @@ export interface User {
   phone: string;
   email: string;
   password: string;
-  userType: 'restaurant' | 'supplier';
+  userType: UserType;
   createdAt: string;
   updatedAt: string;
 }
