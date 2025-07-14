@@ -32,8 +32,9 @@ const App = () => (
               <ShoppingCartProvider>
                 <BrowserRouter>
                   <Routes>
+                  <Route path={`${BASE_URL}login`} element={<Login />} />
                     <Route path={`${BASE_URL}`} element={<Landing />} />
-                    <Route path={`${BASE_URL}login`} element={<Login />} />
+                    
                     <Route path={`${BASE_URL}dashboard`} element={<Index />} />
                     <Route path={`${BASE_URL}profile`} element={<ProfileSettings />} />
                     <Route path={`${BASE_URL}cost-analysis`} element={<CostAnalysis />} />
