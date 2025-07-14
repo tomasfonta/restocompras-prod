@@ -1,18 +1,4 @@
-# Welcome to your Lovable project
-
-## Project info
-
-**URL**: https://lovable.dev/projects/a48aa8c5-e036-4202-9aac-37cb75bb9b49
-
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/a48aa8c5-e036-4202-9aac-37cb75bb9b49) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
+### WELCOME TO RESTOCOMPRAS
 
 **Use your preferred IDE**
 
