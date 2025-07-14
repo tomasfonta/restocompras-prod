@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -11,8 +11,6 @@ import {
   Star,
   CheckCircle,
 } from "lucide-react";
-
-const { BASE_URL } = import.meta.env;
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -29,12 +27,11 @@ const Landing = () => {
             </span>
           </div>
           <div className="flex space-x-4">
-            <Link to="/login">Iniciar Sesión</Link>
-            {/* <Button variant="ghost" onClick={() => navigate(`${BASE_URL}login`)}>
+            <Button variant="ghost" onClick={() => navigate(`/login`)}>
               Iniciar Sesión
-            </Button> */}
+            </Button>
             <Button
-              onClick={() => navigate(`${BASE_URL}login`)}
+              onClick={() => navigate(`/login`)}
               className="bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
             >
               Comenzar Ahora
