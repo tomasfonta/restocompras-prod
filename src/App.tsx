@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -30,16 +29,15 @@ const App = () => (
           <UserProvider>
             <DataProvider>
               <ShoppingCartProvider>
-                <BrowserRouter>
+                <BrowserRouter basename={BASE_URL}>
                   <Routes>
-                  <Route path={`${BASE_URL}login`} element={<Login />} />
-                    <Route path={`${BASE_URL}`} element={<Landing />} />
-                    
-                    <Route path={`${BASE_URL}dashboard`} element={<Index />} />
-                    <Route path={`${BASE_URL}profile`} element={<ProfileSettings />} />
-                    <Route path={`${BASE_URL}cost-analysis`} element={<CostAnalysis />} />
+                    <Route path={`/`} element={<Landing />} />
+                    <Route path={`/login`} element={<Login />} />
+                    <Route path={`/dashboard`} element={<Index />} />
+                    <Route path={`/profile`} element={<ProfileSettings />} />
+                    <Route path={`/cost-analysis`} element={<CostAnalysis />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path={`${BASE_URL}*`} element={<NotFound />} />
+                    <Route path={`*`} element={<NotFound />} />
                   </Routes>
                 </BrowserRouter>
               </ShoppingCartProvider>

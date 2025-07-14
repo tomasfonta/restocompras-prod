@@ -1,10 +1,16 @@
-
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, BarChart3, Users, Package, TrendingUp, Star, CheckCircle } from "lucide-react";
-
+import {
+  ArrowRight,
+  BarChart3,
+  Users,
+  Package,
+  TrendingUp,
+  Star,
+  CheckCircle,
+} from "lucide-react";
 
 const { BASE_URL } = import.meta.env;
 
@@ -23,9 +29,10 @@ const Landing = () => {
             </span>
           </div>
           <div className="flex space-x-4">
-            <Button variant="ghost" onClick={() => navigate(`${BASE_URL}login`)}>
+            <Link to="/login">Iniciar Sesión</Link>
+            {/* <Button variant="ghost" onClick={() => navigate(`${BASE_URL}login`)}>
               Iniciar Sesión
-            </Button>
+            </Button> */}
             <Button
               onClick={() => navigate(`${BASE_URL}login`)}
               className="bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
@@ -42,7 +49,9 @@ const Landing = () => {
         <div className="max-w-4xl mx-auto relative">
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary border border-primary/20 mb-8">
             <Star className="w-4 h-4 mr-2" />
-            <span className="text-sm font-medium">Plataforma líder en gestión de suministros</span>
+            <span className="text-sm font-medium">
+              Plataforma líder en gestión de suministros
+            </span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight">
@@ -55,7 +64,8 @@ const Landing = () => {
 
           <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed">
             La plataforma integral que revoluciona la gestión de suministros,
-            optimiza costos y facilita la comunicación entre proveedores y restaurantes.
+            optimiza costos y facilita la comunicación entre proveedores y
+            restaurantes.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -86,7 +96,8 @@ const Landing = () => {
               Todo lo que necesitas
             </h2>
             <p className="text-xl text-slate-600 max-w-2xl mx-auto">
-              Herramientas poderosas diseñadas para optimizar tu cadena de suministro
+              Herramientas poderosas diseñadas para optimizar tu cadena de
+              suministro
             </p>
           </div>
 
@@ -95,41 +106,54 @@ const Landing = () => {
               {
                 icon: Package,
                 title: "Gestión de Inventario",
-                description: "Control total sobre tu catálogo de productos con actualizaciones en tiempo real"
+                description:
+                  "Control total sobre tu catálogo de productos con actualizaciones en tiempo real",
               },
               {
                 icon: BarChart3,
                 title: "Análisis de Costos",
-                description: "Optimiza gastos con análisis detallados y comparativas de precios"
+                description:
+                  "Optimiza gastos con análisis detallados y comparativas de precios",
               },
               {
                 icon: Users,
                 title: "Red de Proveedores",
-                description: "Conecta con una amplia red de proveedores verificados y confiables"
+                description:
+                  "Conecta con una amplia red de proveedores verificados y confiables",
               },
               {
                 icon: TrendingUp,
                 title: "Reportes Avanzados",
-                description: "Insights profundos para tomar decisiones basadas en datos"
+                description:
+                  "Insights profundos para tomar decisiones basadas en datos",
               },
               {
                 icon: CheckCircle,
                 title: "Gestión de Pedidos",
-                description: "Automatiza y optimiza todo el proceso de pedidos y entregas"
+                description:
+                  "Automatiza y optimiza todo el proceso de pedidos y entregas",
               },
               {
                 icon: Star,
                 title: "Calidad Garantizada",
-                description: "Sistema de calificaciones y reviews para asegurar los mejores productos"
-              }
+                description:
+                  "Sistema de calificaciones y reviews para asegurar los mejores productos",
+              },
             ].map((feature, index) => (
-              <Card key={index} className="group hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-0 shadow-lg">
+              <Card
+                key={index}
+                className="group hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm border-0 shadow-lg"
+              >
                 <CardContent className="p-8">
                   <div className="w-16 h-16 bg-gradient-to-br from-primary to-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-200">
                     <feature.icon className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold mb-4 text-slate-900">{feature.title}</h3>
-                  <p className="text-slate-600 leading-relaxed">{feature.description}</p>
+                  <h3 className="text-xl font-bold mb-4 text-slate-900">
+                    {feature.title}
+                  </h3>
+                  <p className="text-slate-600 leading-relaxed">
+                    {feature.description}
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -139,9 +163,12 @@ const Landing = () => {
 
       {/* Stats Section */}
       <section className="py-20 px-6 bg-gradient-to-r from-primary to-blue-600 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-        }}></div>
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        ></div>
         <div className="max-w-7xl mx-auto relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
             <div className="transform hover:scale-105 transition-transform duration-200">
@@ -170,11 +197,15 @@ const Landing = () => {
         <div className="max-w-4xl mx-auto text-center relative">
           <h2 className="text-4xl md:text-6xl font-bold mb-8 leading-tight">
             ¿Listo para
-            <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent"> revolucionar </span>
+            <span className="bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
+              {" "}
+              revolucionar{" "}
+            </span>
             tu negocio?
           </h2>
           <p className="text-xl text-slate-300 mb-12 max-w-2xl mx-auto">
-            Únete a miles de empresas que ya optimizan sus operaciones con nuestra plataforma
+            Únete a miles de empresas que ya optimizan sus operaciones con
+            nuestra plataforma
           </p>
           <Button
             size="lg"
@@ -192,7 +223,9 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto text-center">
           <div className="flex items-center justify-center space-x-2 mb-6">
             <Package className="w-6 h-6 text-primary" />
-            <span className="text-xl font-bold text-white">SupplyChain Pro</span>
+            <span className="text-xl font-bold text-white">
+              SupplyChain Pro
+            </span>
           </div>
           <p className="text-slate-400">
             © 2024 SupplyChain Pro. Todos los derechos reservados.
