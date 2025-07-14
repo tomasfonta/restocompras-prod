@@ -18,7 +18,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-const basePath = import.meta.env.VITE_BASE_PATH;
+const { BASE_URL } = import.meta.env;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -32,13 +32,13 @@ const App = () => (
               <ShoppingCartProvider>
                 <BrowserRouter>
                   <Routes>
-                    <Route path={`${basePath}`} element={<Landing />} />
-                    <Route path={`${basePath}/login`} element={<Login />} />
-                    <Route path={`${basePath}/dashboard`} element={<Index />} />
-                    <Route path={`${basePath}/profile`} element={<ProfileSettings />} />
-                    <Route path={`${basePath}/cost-analysis`} element={<CostAnalysis />} />
+                    <Route path={`${BASE_URL}`} element={<Landing />} />
+                    <Route path={`${BASE_URL}login`} element={<Login />} />
+                    <Route path={`${BASE_URL}dashboard`} element={<Index />} />
+                    <Route path={`${BASE_URL}profile`} element={<ProfileSettings />} />
+                    <Route path={`${BASE_URL}cost-analysis`} element={<CostAnalysis />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
+                    <Route path={`${BASE_URL}*`} element={<NotFound />} />
                   </Routes>
                 </BrowserRouter>
               </ShoppingCartProvider>
