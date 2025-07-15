@@ -13,17 +13,18 @@ import {
 } from "lucide-react";
 import restocomprasLogo from "../../public/restocompraslogo.png";
 
+const VIDEO_SRC = "../../public/resto1.mp4";
+
 const Landing = () => {
   const navigate = useNavigate();
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Navigation */}
-      <nav className="px-6 py-4 backdrop-blur-md bg-white/80 border-b border-blue-100">
+      <nav className="px-6 py-4 min-h-[72px] backdrop-blur-md bg-white/80 border-b border-blue-100 overflow-x-auto">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2">
             <img src={restocomprasLogo} alt="RestoCompras Logo" className="w-10 h-10 object-contain" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+            <span className="text-lg sm:text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
               RestoCompras
             </span>
           </div>
@@ -56,14 +57,17 @@ const Landing = () => {
             <br />
             <span className="text-slate-700">con Restaurantes</span>
           </h1>
+          <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
+            <iframe
+              id="js_video_iframe"
+              src="https://jumpshare.com/embed/Ati8GSWGo1tFQkDdSW7J"
+              frameBorder="0"
+              allowFullScreen
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+            ></iframe>
+          </div>
 
-          <p className="text-xl md:text-2xl text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-            La plataforma integral que revoluciona la gestión de suministros,
-            optimiza costos y facilita la comunicación entre proveedores y
-            restaurantes.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
             <Button
               size="lg"
               onClick={() => navigate(`/login`)}

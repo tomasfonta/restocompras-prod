@@ -41,8 +41,8 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
   // Filter products based on search and filters
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.supplierName.toLowerCase().includes(searchTerm.toLowerCase());
+      product.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.supplierName.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
     const matchesQuality = selectedQuality === 'all' || product.quality === selectedQuality;
     return matchesSearch && matchesCategory && matchesQuality;
@@ -60,7 +60,7 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
   const handleAnalysisTab = () => setActiveTab('analysis');
 
   // Get supplier products for profile view
-  const supplierProducts = selectedSupplierId 
+  const supplierProducts = selectedSupplierId
     ? products.filter(p => p.supplierId === selectedSupplierId)
     : [];
 
@@ -85,7 +85,29 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
       </div>
 
       <Tabs value={activeTab} defaultValue="catalog" className="space-y-6" onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-4">
+        {/* Mobile Pills Tabs */}
+        <TabsList className="flex w-full overflow-x-auto gap-2 sm:hidden py-2 px-1 bg-slate-100 rounded-lg">
+          <TabsTrigger value="catalog" className="rounded-full px-4 py-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow">
+            {t('buyerPortal.tabs.catalog')}
+          </TabsTrigger>
+          <TabsTrigger value="menu" className="rounded-full px-4 py-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow">
+            {t('buyerPortal.tabs.menu')}
+          </TabsTrigger>
+          <TabsTrigger value="analysis" className="rounded-full px-4 py-2 whitespace-nowrap data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow">
+            {t('buyerPortal.tabs.costAnalysis')}
+          </TabsTrigger>
+          <TabsTrigger value="cart" className="rounded-full px-4 py-2 whitespace-nowrap relative data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow">
+            <CartIcon className="w-4 h-4 mr-2 inline" />
+            {t('shoppingCart.title')}
+            {cartItems.length > 0 && (
+              <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 p-0 text-xs flex items-center justify-center">
+                {cartItems.length}
+              </Badge>
+            )}
+          </TabsTrigger>
+        </TabsList>
+        {/* Desktop Tabs */}
+        <TabsList className="hidden sm:grid w-full grid-cols-4 mb-2">
           <TabsTrigger value="catalog">{t('buyerPortal.tabs.catalog')}</TabsTrigger>
           <TabsTrigger value="menu">{t('buyerPortal.tabs.menu')}</TabsTrigger>
           <TabsTrigger value="analysis">{t('buyerPortal.tabs.costAnalysis')}</TabsTrigger>
@@ -136,8 +158,8 @@ const BuyerPortal: React.FC<BuyerPortalProps> = ({ products }) => {
           {/* Products Table */}
           <ProductTable
             products={filteredProducts}
-            onEdit={() => {}} // Not used in buyer view
-            onDelete={() => {}} // Not used in buyer view
+            onEdit={() => { }} // Not used in buyer view
+            onDelete={() => { }} // Not used in buyer view
             isSupplierView={false}
             onSupplierClick={handleSupplierClick}
           />

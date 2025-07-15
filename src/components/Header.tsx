@@ -34,23 +34,23 @@ const Header = () => {
   }
 
   return (
-    <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-6 py-4 shadow-sm backdrop-blur-md">
+    <header className="bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-700 px-6 py-2 sm:py-4 shadow-sm backdrop-blur-md">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
-        <div className="flex items-center space-x-8">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
-              <span className="text-white font-bold text-lg">R</span>
+        <div className="flex items-center space-x-4 sm:space-x-8">
+          <div className="flex items-center space-x-2 sm:space-x-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary to-blue-600 rounded-lg flex items-center justify-center shadow-lg">
+              <span className="text-white font-bold text-base sm:text-lg">R</span>
             </div>
             <div>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-base sm:text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
                 RestoCompras
               </h1>
-              <p className="text-sm text-slate-600 dark:text-slate-400">{currentUser.companyName}</p>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">{currentUser.companyName}</p>
             </div>
+
           </div>
-          
-          <Badge 
-            variant="default" 
+          <Badge
+            variant="default"
             className={`${currentUser.userType === 'supplier' ? "bg-primary" : "bg-green-500"} text-white shadow-lg`}
           >
             {currentUser.userType === 'supplier' ? t('header.supplier') : t('header.restaurant')}
@@ -66,7 +66,7 @@ const Header = () => {
           >
             {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </Button>
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
@@ -82,7 +82,7 @@ const Header = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white">
@@ -93,7 +93,7 @@ const Header = () => {
             </DropdownMenuTrigger>
             <DropdownMenuContent className="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-lg" align="end">
               <DropdownMenuItem onClick={handleProfileClick} className="hover:bg-gray-50 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100">
-                <User className="w-4 h-4 mr-2" />
+                <User className="w-4 h-4 mr-2" /> 
                 {t('header.myProfile')}
               </DropdownMenuItem>
               <DropdownMenuItem className="hover:bg-gray-50 dark:hover:bg-slate-700 text-slate-900 dark:text-slate-100">
@@ -101,7 +101,7 @@ const Header = () => {
                 {t('header.settings')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={handleLogout}
                 className="hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400"
               >
