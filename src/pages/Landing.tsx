@@ -11,6 +11,7 @@ import {
   Star,
   CheckCircle,
 } from "lucide-react";
+import restocomprasLogo from "../../public/restocompraslogo.png";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -21,15 +22,12 @@ const Landing = () => {
       <nav className="px-6 py-4 backdrop-blur-md bg-white/80 border-b border-blue-100">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center space-x-2">
-            <Package className="w-8 h-8 text-primary" />
+            <img src={restocomprasLogo} alt="RestoCompras Logo" className="w-10 h-10 object-contain" />
             <span className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-              SupplyChain Pro
+              RestoCompras
             </span>
           </div>
           <div className="flex space-x-4">
-            <Button variant="ghost" onClick={() => navigate(`/login`)}>
-              Iniciar Sesión
-            </Button>
             <Button
               onClick={() => navigate(`/login`)}
               className="bg-primary hover:bg-primary/90 text-white shadow-lg hover:shadow-xl transition-all duration-200"
@@ -73,13 +71,6 @@ const Landing = () => {
             >
               Comenzar Gratis
               <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="px-8 py-4 text-lg rounded-xl border-2 border-primary/20 hover:border-primary/40 transition-all duration-200"
-            >
-              Ver Demo
             </Button>
           </div>
         </div>
@@ -169,15 +160,15 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto relative">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
             <div className="transform hover:scale-105 transition-transform duration-200">
-              <div className="text-4xl md:text-5xl font-bold mb-2">500+</div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">55+</div>
               <div className="text-blue-100 text-lg">Proveedores Activos</div>
             </div>
             <div className="transform hover:scale-105 transition-transform duration-200">
-              <div className="text-4xl md:text-5xl font-bold mb-2">1,200+</div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">200+</div>
               <div className="text-blue-100 text-lg">Restaurantes</div>
             </div>
             <div className="transform hover:scale-105 transition-transform duration-200">
-              <div className="text-4xl md:text-5xl font-bold mb-2">50,000+</div>
+              <div className="text-4xl md:text-5xl font-bold mb-2">1,200+</div>
               <div className="text-blue-100 text-lg">Productos</div>
             </div>
             <div className="transform hover:scale-105 transition-transform duration-200">
@@ -206,7 +197,7 @@ const Landing = () => {
           </p>
           <Button
             size="lg"
-            onClick={() => navigate(`${BASE_URL}login`)}
+            onClick={() => navigate(`/login`)}
             className="bg-primary hover:bg-primary/90 text-white px-12 py-6 text-xl rounded-xl shadow-2xl hover:shadow-3xl transition-all duration-200 group"
           >
             Comenzar Ahora
@@ -221,11 +212,11 @@ const Landing = () => {
           <div className="flex items-center justify-center space-x-2 mb-6">
             <Package className="w-6 h-6 text-primary" />
             <span className="text-xl font-bold text-white">
-              SupplyChain Pro
+              RestoCompras
             </span>
           </div>
           <p className="text-slate-400">
-            © 2024 SupplyChain Pro. Todos los derechos reservados.
+            © 2025 RestoCompras. Todos los derechos reservados.
           </p>
         </div>
       </footer>
