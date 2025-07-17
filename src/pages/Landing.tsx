@@ -60,13 +60,12 @@ const Landing = () => {
           <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0 }}>
             <iframe
               id="js_video_iframe"
-              src="https://jumpshare.com/embed/Ati8GSWGo1tFQkDdSW7J"
+              src="https://jumpshare.com/embed/jXRkpqiuJozo6fgl99Cl"
               frameBorder="0"
-              allowFullScreen
-              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
-            ></iframe>
+              allowFullScreen 
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+              </iframe>
           </div>
-
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
             <Button
               size="lg"
